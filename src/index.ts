@@ -32,19 +32,15 @@ if (cluster.isPrimary) {
     res.end();
   });
 
-  const server = http.createServer((req: Request, res: Response) => {
-    res.write("Hello Nifemi, my name is Quickee Food");
-    res.end();
-  });
+  const server = http.createServer(app);
 
   const ip = "127.0.0.1";
   //   const ip = "192.168.137.1";
-  const port = 80;
+  const port = 3000;
 
   server.listen(
     port,
     /* ip,*/ () => {
-      // console.log(`Server running on http://${ip}:${port}/`);
       console.log(`Server running on port ${port}`);
     }
   );
