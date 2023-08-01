@@ -1,0 +1,7 @@
+previous nodemon.json file content 
+
+{
+  "watch": ["src"],
+  "ext": ".ts,.js",
+  "exec": "ts-node ./src/index.ts"
+}
