@@ -15,12 +15,17 @@ if (cluster.isPrimary) {
 
   for (let i = 0; i < numCPUs; i++) {
     const createWorker = cluster.fork();
-    console.log(`Worker with id: ${createWorker.id} has been created`);
+    console.log(
+      `Worker with pid: ${createWorker.process.pid} has been created`
+    );
   }
 
   cluster.on("exit", (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    cluster.fork();
+    console.log(`Worker with pid: ${worker.process.pid} just died`);
+    const newWorker = cluster.fork();
+    console.log(
+      `Another Worker with pid: ${newWorker.process.pid} has been created to replace the worker that just died`
+    );
   });
 } else {
   const app = express();
@@ -45,7 +50,7 @@ if (cluster.isPrimary) {
 
   const ip = "127.0.0.1";
   //   const ip = "192.168.137.1";
-  const port = 3000;
+  const port = 80;
 
   server.listen(
     port,
