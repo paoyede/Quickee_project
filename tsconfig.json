@@ -5,8 +5,22 @@
     "baseUrl": "src",
     "outDir": "dist",
     "sourceMap": true,
-    "noImplicitAny": true
-    // "esModuleInterop": true
+    "noImplicitAny": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*"]
 }
+// {
+//   "compilerOptions": {
+//     "module": "commonjs",
+//     "esModuleInterop": true,
+//     "target": "es6",
+//     "moduleResolution": "node",
+//     "sourceMap": true,
+//     "outDir": "dist"
+//     // "baseUrl": "src",
+//     // "noImplicitAny": true,
+//   },
+//   "lib": ["es2015"]
+//   // "include": ["src/**/*"]
+// }
