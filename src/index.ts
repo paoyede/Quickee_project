@@ -7,13 +7,16 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import cors from "cors";
 
+const numCPUs = cpus().length;
+
 if (cluster.isPrimary) {
   // Fork workers equal to the number of CPU cores
-  const numCPUs = cpus().length;
+  console.log("Number of CPU(s): ", numCPUs);
+
   for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
+    const createWorker = cluster.fork();
+    console.log(`Worker with id: ${createWorker.id} has been created`);
   }
-  // console.log("Number of CPU(s): ", numCPUs);
 
   cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died`);
@@ -27,8 +30,14 @@ if (cluster.isPrimary) {
   app.use(cookieParser());
   app.use(bodyParser.json());
 
-  app.use("/", (req: Request, res: Response) => {
+  app.get("/", (req: Request, res: Response) => {
     res.write("Hello Nifemi, my name is Quickee Food");
+    res.end();
+  });
+
+  app.get("/signin", (req, res) => {
+    const { name } = req.query;
+    res.write(`Welcome ${name}`);
     res.end();
   });
 
@@ -41,7 +50,8 @@ if (cluster.isPrimary) {
   server.listen(
     port,
     /* ip,*/ () => {
-      console.log(`Server running on port ${port}`);
+      cluster.worker.id === numCPUs &&
+        console.log(`Server running on port ${port}`);
     }
   );
 }
