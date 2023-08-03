@@ -1,0 +1,10 @@
+@rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
+##@rtk1 = {{rtk}}
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzcsImV4cCI6MTY4NzQ4MjczN30.sgxSM8_50mgHmURuVsieVCzTYijYudUMTI1PopjsHGI
+###@atk1 = {{atk}}
+@url = http://192.168.137.1:80
+# @url = http://127.0.0.1:5000
+
+###
+GET {{url}}/DbOps/createdb?dbName=student
+###

@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import cors from "cors";
+import DbOpsRoute from "./Routes/DbRoute";
+import authRoute from "./Routes/AuthRoute";
 
 const numCPUs = cpus().length;
 
@@ -34,6 +36,8 @@ if (cluster.isPrimary) {
   app.use(compression());
   app.use(cookieParser());
   app.use(bodyParser.json());
+  app.use("/DbOps", DbOpsRoute);
+  app.use("/Auth", authRoute);
 
   app.get("/", (req: Request, res: Response) => {
     res.write("Hello Nifemi, my name is Quickee Food");
