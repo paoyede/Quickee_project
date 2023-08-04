@@ -8,3 +8,4 @@
 ###
 GET {{url}}/DbOps/createdb?dbName=student
 ###
+GET {{url}}/DbOps/createtable
