@@ -11,6 +11,8 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const compression_1 = __importDefault(require("compression"));
 const cors_1 = __importDefault(require("cors"));
+const DbRoute_1 = __importDefault(require("./Routes/DbRoute"));
+const AuthRoute_1 = __importDefault(require("./Routes/AuthRoute"));
 const numCPUs = (0, os_1.cpus)().length;
 if (cluster_1.default.isPrimary) {
     // Fork workers equal to the number of CPU cores
@@ -31,6 +33,8 @@ else {
     app.use((0, compression_1.default)());
     app.use((0, cookie_parser_1.default)());
     app.use(body_parser_1.default.json());
+    app.use("/DbOps", DbRoute_1.default);
+    app.use("/Auth", AuthRoute_1.default);
     app.get("/", (req, res) => {
         res.write("Hello Nifemi, my name is Quickee Food");
         res.end();
@@ -44,6 +48,7 @@ else {
     const ip = "127.0.0.1";
     //   const ip = "192.168.137.1";
     const port = 80;
+    // const port = 5000;
     server.listen(port, 
     /* ip,*/ () => {
         cluster_1.default.worker.id === numCPUs &&

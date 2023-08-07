@@ -1,9 +1,9 @@
 import { Pool } from "pg";
 
 const client = new Pool({
-  user: "quickee",
-  password: "quickeedatabase",
-  host: "quickeedb-18.czjkbfe4jxep.us-east-1.rds.amazonaws.com",
+  user: "postgres",
+  password: "QuickeeDb123",
+  host: "database-1.cr7kfuwh0rwo.us-east-2.rds.amazonaws.com",
   port: 5432,
   database: "quickee",
 });
