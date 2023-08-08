@@ -4,19 +4,10 @@ const Configs_1 = require("../../../Utilities/Configs");
 class Producer {
     connection;
     channel;
-    constructor() {
-        // const rabbitmqConnection = RabbitMQConfig.getInstance();
-        this.connection = null;
+    constructor(connection) {
+        this.connection = connection;
         this.channel = null;
-        // rabbitmqConnection
-        //   .createRabbitMQConnection()
-        //   .then((connection) => {
-        //     this.connection = connection;
-        //     this.createChannel();
-        //   })
-        //   .catch((error) => {
-        //     console.error("Error creating RabbitMQ connection", error);
-        //   });
+        this.createChannel();
     }
     createChannel() {
         if (!this.connection) {
@@ -27,7 +18,6 @@ class Producer {
             .then((channel) => {
             this.channel = channel;
             this.configureChannel();
-            this.channel.checkQueue("email.queue.log").then((c) => console.log(c));
         })
             .catch((error) => {
             console.error("Error creating channel", error);

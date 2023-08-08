@@ -73,11 +73,13 @@ if (cluster.isPrimary) {
   );
 }
 
+let producer: Producer, consumer: Consumer;
 async function startApp() {
   const rabbitConnection = new RabbitMQConfig();
   await rabbitConnection.initialize();
-  // console.log(rabbitConnection);
   // Start your server or perform other actions here
-  const producer = new Producer(rabbitConnection.connection);
-  const consumer = new Consumer(rabbitConnection.connection);
+  producer = new Producer(rabbitConnection.connection);
+  consumer = new Consumer(rabbitConnection.connection);
 }
+
+export { producer, consumer };

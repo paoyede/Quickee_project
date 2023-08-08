@@ -32,10 +32,7 @@ if (cluster_1.default.isPrimary) {
 }
 else {
     if (cluster_1.default.worker.id === numCPUs) {
-        const rabbitConnection = new Connection_1.default();
-        console.log(rabbitConnection.connection);
-        const producer = new Producer_1.default();
-        const consumer = new Consumer_1.default();
+        startApp();
     }
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({ credentials: true }));
@@ -63,5 +60,13 @@ else {
         cluster_1.default.worker.id === numCPUs &&
             console.log(`Server running on port ${port}`);
     });
+}
+async function startApp() {
+    const rabbitConnection = new Connection_1.default();
+    await rabbitConnection.initialize();
+    // console.log(rabbitConnection);
+    // Start your server or perform other actions here
+    const producer = new Producer_1.default(rabbitConnection.connection);
+    const consumer = new Consumer_1.default(rabbitConnection.connection);
 }
 //# sourceMappingURL=index.js.map

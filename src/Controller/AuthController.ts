@@ -1,4 +1,3 @@
-import { SendEmailMessage } from "./../Services/Implementations/SendEmail/NodeMailer";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import {
@@ -16,6 +15,7 @@ import {
 } from "../Response/Responses";
 import { Message } from "../Response/IResponse";
 import { ISignUp } from "../Models/ISignUp";
+import { producer } from "../index";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -34,11 +34,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       payload.UserName = username;
       const hash = await bcrypt.hash(payload.Password, 10);
       payload.Password = hash;
-      await SendEmailMessage(
-        "nifemiojinni22@gmail.com",
-        "Quickee Food Company",
-        "This is a test"
-      );
+      producer.publishMessage("This is a test");
       const response = await AddToDB(stdTab, payload);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);
