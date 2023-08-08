@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.consumer = exports.producer = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const cluster_1 = __importDefault(require("cluster"));
@@ -61,12 +62,12 @@ else {
             console.log(`Server running on port ${port}`);
     });
 }
+let producer, consumer;
 async function startApp() {
     const rabbitConnection = new Connection_1.default();
     await rabbitConnection.initialize();
-    // console.log(rabbitConnection);
     // Start your server or perform other actions here
-    const producer = new Producer_1.default(rabbitConnection.connection);
-    const consumer = new Consumer_1.default(rabbitConnection.connection);
+    exports.producer = producer = new Producer_1.default(rabbitConnection.connection);
+    exports.consumer = consumer = new Consumer_1.default(rabbitConnection.connection);
 }
 //# sourceMappingURL=index.js.map

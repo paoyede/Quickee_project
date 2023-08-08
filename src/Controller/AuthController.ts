@@ -15,12 +15,13 @@ import {
 } from "../Response/Responses";
 import { Message } from "../Response/IResponse";
 import { ISignUp } from "../Models/ISignUp";
-import { producer } from "../index";
 
 const stdTab = "Student";
 const dbId = "Email";
+
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const payload: ISignUp = req.body;
+  console.log(payload);
   try {
     const userId = payload.Email;
     // console.log(userId);
@@ -34,7 +35,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       payload.UserName = username;
       const hash = await bcrypt.hash(payload.Password, 10);
       payload.Password = hash;
-      producer.publishMessage("This is a test");
+      // producer.publishMessage("This is a test");
       const response = await AddToDB(stdTab, payload);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);

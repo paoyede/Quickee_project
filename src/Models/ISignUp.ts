@@ -4,5 +4,5 @@ export interface ISignUp {
   University: string;
   Password: string;
   Email: string;
-  UserName: string;
+  UserName?: string;
 }

@@ -1,5 +1,4 @@
 import * as amqp from "amqplib";
-import RabbitMQConfig from "./Connection";
 import {
   QNExchange,
   QNRoutingKey,

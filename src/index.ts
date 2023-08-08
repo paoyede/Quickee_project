@@ -82,4 +82,4 @@ async function startApp() {
   consumer = new Consumer(rabbitConnection.connection);
 }
 
-export { producer, consumer };
+// export { producer, consumer };
