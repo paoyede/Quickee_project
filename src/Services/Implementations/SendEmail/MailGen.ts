@@ -11,8 +11,8 @@ interface MailGeneratorOptions {
 const MailGenerator = new Mailgen({
   theme: "default",
   product: {
-    name: "ArchIntel",
-    link: "https://archdemy.netlify.app/",
+    name: "Quickee Food",
+    link: "https://quickeefood.netlify.app/",
   },
 });
 
