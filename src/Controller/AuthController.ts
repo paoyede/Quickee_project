@@ -25,19 +25,15 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     var isUserExist = await FirstOrDefault(stdTab, dbId, userId);
     if (isUserExist != null) {
       const error = Message(400, UserIsExist);
-      console.log("seen-1, ", error);
       res.status(400).json(error);
     } else {
-      console.log("seen-2");
       const response = await AddToDB(stdTab, payload);
-      console.log("seen-3, ", response);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);
     }
     // console.log(payload);
   } catch (error) {
     const err = Message(500, InternalError);
-    console.log("see payload: ", payload);
     res.status(500).json(err);
   }
 };
