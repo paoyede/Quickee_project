@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
 import {
   AddToDB,
   AlterTable,
@@ -30,6 +31,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       const username = (payload.UserName =
         payload.FirstName + "." + payload.LastName);
       payload.UserName = username;
+      const hash = await bcrypt.hash(payload.Password, 10);
+      payload.Password = hash;
       const response = await AddToDB(stdTab, payload);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);
