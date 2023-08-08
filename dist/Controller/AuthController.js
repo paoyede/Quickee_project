@@ -14,13 +14,13 @@ const signup = async (req, res) => {
         var isUserExist = await (0, Repository_1.FirstOrDefault)(stdTab, dbId, userId);
         if (isUserExist != null) {
             const error = (0, IResponse_1.Message)(400, Responses_1.UserIsExist);
-            console.log("seen-1, ", error);
             res.status(400).json(error);
         }
         else {
-            console.log("seen-2");
+            const username = (payload.UserName =
+                payload.FirstName + "." + payload.LastName);
+            payload.UserName = username;
             const response = await (0, Repository_1.AddToDB)(stdTab, payload);
-            console.log("seen-3, ", response);
             const success = (0, IResponse_1.Message)(200, Responses_1.CreateSuccess, response);
             res.status(200).json(success);
         }
@@ -28,7 +28,6 @@ const signup = async (req, res) => {
     }
     catch (error) {
         const err = (0, IResponse_1.Message)(500, Responses_1.InternalError);
-        console.log("see payload: ", payload);
         res.status(500).json(err);
     }
 };

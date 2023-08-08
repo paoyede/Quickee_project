@@ -27,6 +27,9 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       const error = Message(400, UserIsExist);
       res.status(400).json(error);
     } else {
+      const username = (payload.UserName =
+        payload.FirstName + "." + payload.LastName);
+      payload.UserName = username;
       const response = await AddToDB(stdTab, payload);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);

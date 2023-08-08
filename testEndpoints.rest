@@ -17,8 +17,8 @@ Content-Type: application/json
     "FirstName": "Nifemi",
     "LastName": "Ojinni",
     "Email": "nifemiojinni22@gmail.com",
-    "Password": "1234567ACND",
+    "Password": "@$Nifemi567",
     "IsVerifiedEmail": true,
     "University": "Elizade University",
-    "UserName": "Nifemi.Ojinni"
+    "UserName": ""
 }
