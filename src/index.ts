@@ -10,11 +10,9 @@ import DbOpsRoute from "./Routes/DbRoute";
 import authRoute from "./Routes/AuthRoute";
 import Producer from "./Services/Implementations/MessageBroker/Producer";
 import Consumer from "./Services/Implementations/MessageBroker/Consumer";
+import RabbitMQConfig from "./Services/Implementations/MessageBroker/Connection";
 
 const numCPUs = cpus().length;
-
-// const producer = new Producer();
-// const consumer = new Consumer();
 
 if (cluster.isPrimary) {
   // Fork workers equal to the number of CPU cores
@@ -35,6 +33,12 @@ if (cluster.isPrimary) {
     );
   });
 } else {
+  if (cluster.worker.id === numCPUs) {
+    const rabbitConnection = RabbitMQConfig.getInstance();
+    const producer = new Producer();
+    const consumer = new Consumer();
+  }
+
   const app = express();
 
   app.use(cors({ credentials: true }));

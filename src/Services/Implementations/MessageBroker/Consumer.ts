@@ -6,27 +6,32 @@ import {
   QNotification,
 } from "../../../Utilities/Configs";
 
-const rabbitConnection = new RabbitMQConfig();
-
 class Consumer {
-  connection: amqp.Connection | null;
-  channel: amqp.Channel | null;
+  private connection: amqp.Connection | null;
+  private channel: amqp.Channel | null;
 
   constructor() {
+    const rabbitmqConnection = RabbitMQConfig.getInstance();
+
     this.connection = null;
     this.channel = null;
-    rabbitConnection
+
+    rabbitmqConnection
       .createRabbitMQConnection()
-      .then((connection: amqp.Connection) => {
+      .then((connection) => {
         this.connection = connection;
         this.createChannel();
       })
-      .catch((error: Error) => {
+      .catch((error) => {
         console.error("Error creating RabbitMQ connection", error);
       });
   }
 
   createChannel(): void {
+    if (!this.connection) {
+      throw new Error("RabbitMQ connection is not established.");
+    }
+
     this.connection
       .createChannel()
       .then((channel: amqp.Channel) => {
@@ -40,6 +45,10 @@ class Consumer {
   }
 
   configureChannel(): void {
+    if (!this.channel) {
+      throw new Error("RabbitMQ channel is not created.");
+    }
+
     const exchangeName: string = QNExchange;
     this.channel
       .assertExchange(exchangeName, "topic")
@@ -66,6 +75,10 @@ class Consumer {
   }
 
   consumeMessages(): void {
+    if (!this.channel) {
+      throw new Error("RabbitMQ channel is not created.");
+    }
+
     const queueName: string = QNotification;
 
     this.channel.consume(queueName, (msg: amqp.ConsumeMessage | null) => {

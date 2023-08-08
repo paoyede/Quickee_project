@@ -6,16 +6,17 @@ import {
   QNotification,
 } from "../../../Utilities/Configs";
 
-const rabbitConnection = new RabbitMQConfig();
-
 class Producer {
   private connection: amqp.Connection | null;
   private channel: amqp.Channel | null;
 
   constructor() {
+    const rabbitmqConnection = RabbitMQConfig.getInstance();
+
     this.connection = null;
     this.channel = null;
-    rabbitConnection
+
+    rabbitmqConnection
       .createRabbitMQConnection()
       .then((connection) => {
         this.connection = connection;
@@ -36,6 +37,7 @@ class Producer {
       .then((channel) => {
         this.channel = channel;
         this.configureChannel();
+        this.channel.checkQueue("email.queue.log").then((c) => console.log(c));
       })
       .catch((error) => {
         console.error("Error creating channel", error);

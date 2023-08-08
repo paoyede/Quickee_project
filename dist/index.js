@@ -13,6 +13,9 @@ const compression_1 = __importDefault(require("compression"));
 const cors_1 = __importDefault(require("cors"));
 const DbRoute_1 = __importDefault(require("./Routes/DbRoute"));
 const AuthRoute_1 = __importDefault(require("./Routes/AuthRoute"));
+const Producer_1 = __importDefault(require("./Services/Implementations/MessageBroker/Producer"));
+const Consumer_1 = __importDefault(require("./Services/Implementations/MessageBroker/Consumer"));
+const Connection_1 = __importDefault(require("./Services/Implementations/MessageBroker/Connection"));
 const numCPUs = (0, os_1.cpus)().length;
 if (cluster_1.default.isPrimary) {
     // Fork workers equal to the number of CPU cores
@@ -28,6 +31,12 @@ if (cluster_1.default.isPrimary) {
     });
 }
 else {
+    if (cluster_1.default.worker.id === numCPUs) {
+        const rabbitConnection = Connection_1.default.getInstance();
+        console.log(rabbitConnection);
+        const producer = new Producer_1.default();
+        const consumer = new Consumer_1.default();
+    }
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({ credentials: true }));
     app.use((0, compression_1.default)());
