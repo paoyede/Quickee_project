@@ -21,7 +21,7 @@ const dbId = "Email";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const payload: ISignUp = req.body;
-  console.log(payload);
+  // console.log(payload);
   try {
     const userId = payload.Email;
     // console.log(userId);
