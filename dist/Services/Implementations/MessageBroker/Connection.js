@@ -26,30 +26,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const amqp = __importStar(require("amqplib"));
 const Configs_1 = require("../../../Utilities/Configs");
 class RabbitMQConfig {
-    static instance = null;
+    // private static instance: RabbitMQConfig | null = null;
     connection;
     constructor() {
         this.connection = null;
+        this.createRabbitMQConnection()
+            .then((connection) => {
+            this.connection = connection;
+        })
+            .catch((error) => {
+            console.error("Error creating RabbitMQ connection", error);
+        });
     }
-    static getInstance() {
-        if (!RabbitMQConfig.instance) {
-            RabbitMQConfig.instance = new RabbitMQConfig();
-        }
-        return RabbitMQConfig.instance;
-    }
+    // static getInstance(): RabbitMQConfig {
+    //   if (!RabbitMQConfig.instance) {
+    //     RabbitMQConfig.instance = new RabbitMQConfig();
+    //   }
+    //   return RabbitMQConfig.instance;
+    // }
     async createRabbitMQConnection() {
         try {
-            if (this.connection === null) {
-                console.log("Connecting to RabbitMQ");
-                this.connection = await amqp.connect({
-                    hostname: Configs_1.Host,
-                    username: Configs_1.Username,
-                    password: Configs_1.Password,
-                    port: Configs_1.Port,
-                    vhost: Configs_1.Virtual,
-                });
-                console.log("Connected to RabbitMQ");
-            }
+            // if (!this.connection) {
+            console.log("Connecting to RabbitMQ");
+            this.connection = await amqp.connect({
+                hostname: Configs_1.Host,
+                username: Configs_1.Username,
+                password: Configs_1.Password,
+                port: Configs_1.Port,
+                vhost: Configs_1.Virtual,
+            });
+            console.log("Connected to RabbitMQ");
             return this.connection;
         }
         catch (error) {

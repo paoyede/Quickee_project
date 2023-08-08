@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signin = exports.signup = void 0;
+const NodeMailer_1 = require("./../Services/Implementations/SendEmail/NodeMailer");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const Repository_1 = require("../Infrastructure/Repository");
 const Responses_1 = require("../Response/Responses");
@@ -26,6 +27,7 @@ const signup = async (req, res) => {
             payload.UserName = username;
             const hash = await bcrypt_1.default.hash(payload.Password, 10);
             payload.Password = hash;
+            await (0, NodeMailer_1.SendEmailMessage)("nifemiojinni22@gmail.com", "Quickee Food Company", "This is a test");
             const response = await (0, Repository_1.AddToDB)(stdTab, payload);
             const success = (0, IResponse_1.Message)(200, Responses_1.CreateSuccess, response);
             res.status(200).json(success);

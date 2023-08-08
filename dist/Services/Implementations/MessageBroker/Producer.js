@@ -1,26 +1,22 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const Connection_1 = __importDefault(require("./Connection"));
 const Configs_1 = require("../../../Utilities/Configs");
 class Producer {
     connection;
     channel;
     constructor() {
-        const rabbitmqConnection = Connection_1.default.getInstance();
+        // const rabbitmqConnection = RabbitMQConfig.getInstance();
         this.connection = null;
         this.channel = null;
-        rabbitmqConnection
-            .createRabbitMQConnection()
-            .then((connection) => {
-            this.connection = connection;
-            this.createChannel();
-        })
-            .catch((error) => {
-            console.error("Error creating RabbitMQ connection", error);
-        });
+        // rabbitmqConnection
+        //   .createRabbitMQConnection()
+        //   .then((connection) => {
+        //     this.connection = connection;
+        //     this.createChannel();
+        //   })
+        //   .catch((error) => {
+        //     console.error("Error creating RabbitMQ connection", error);
+        //   });
     }
     createChannel() {
         if (!this.connection) {
@@ -31,6 +27,7 @@ class Producer {
             .then((channel) => {
             this.channel = channel;
             this.configureChannel();
+            this.channel.checkQueue("email.queue.log").then((c) => console.log(c));
         })
             .catch((error) => {
             console.error("Error creating channel", error);

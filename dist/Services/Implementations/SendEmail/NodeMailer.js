@@ -15,8 +15,8 @@ const SendEmailMessage = async (to, subject, message) => {
     // param = mailerConfig.mainParam;
     let transporter = nodemailer_1.default.createTransport(param);
     let mailOptions = {
-        from: `ArchIntel <${param.auth.user}>`,
-        to: `Alade ${to}`,
+        from: `Quickee <${param.auth.user}>`,
+        to: `Nifemi ${to}`,
         subject: subject,
         text: message,
         html: MailGen_1.mail,

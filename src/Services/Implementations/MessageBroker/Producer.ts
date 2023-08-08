@@ -7,24 +7,14 @@ import {
 } from "../../../Utilities/Configs";
 
 class Producer {
-  private connection: amqp.Connection | null;
+  private connection: amqp.Connection;
   private channel: amqp.Channel | null;
 
-  constructor() {
-    const rabbitmqConnection = RabbitMQConfig.getInstance();
-
-    this.connection = null;
+  constructor(connection: amqp.Connection) {
+    this.connection = connection;
     this.channel = null;
 
-    rabbitmqConnection
-      .createRabbitMQConnection()
-      .then((connection) => {
-        this.connection = connection;
-        this.createChannel();
-      })
-      .catch((error) => {
-        console.error("Error creating RabbitMQ connection", error);
-      });
+    this.createChannel();
   }
 
   private createChannel() {
@@ -37,7 +27,6 @@ class Producer {
       .then((channel) => {
         this.channel = channel;
         this.configureChannel();
-        this.channel.checkQueue("email.queue.log").then((c) => console.log(c));
       })
       .catch((error) => {
         console.error("Error creating channel", error);

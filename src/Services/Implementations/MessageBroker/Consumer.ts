@@ -7,24 +7,14 @@ import {
 } from "../../../Utilities/Configs";
 
 class Consumer {
-  private connection: amqp.Connection | null;
+  private connection: amqp.Connection;
   private channel: amqp.Channel | null;
 
-  constructor() {
-    const rabbitmqConnection = RabbitMQConfig.getInstance();
-
-    this.connection = null;
+  constructor(connection: amqp.Connection) {
+    this.connection = connection;
     this.channel = null;
 
-    rabbitmqConnection
-      .createRabbitMQConnection()
-      .then((connection) => {
-        this.connection = connection;
-        this.createChannel();
-      })
-      .catch((error) => {
-        console.error("Error creating RabbitMQ connection", error);
-      });
+    this.createChannel();
   }
 
   createChannel(): void {

@@ -32,8 +32,8 @@ if (cluster_1.default.isPrimary) {
 }
 else {
     if (cluster_1.default.worker.id === numCPUs) {
-        const rabbitConnection = Connection_1.default.getInstance();
-        console.log(rabbitConnection);
+        const rabbitConnection = new Connection_1.default();
+        console.log(rabbitConnection.connection);
         const producer = new Producer_1.default();
         const consumer = new Consumer_1.default();
     }

@@ -34,9 +34,7 @@ if (cluster.isPrimary) {
   });
 } else {
   if (cluster.worker.id === numCPUs) {
-    const rabbitConnection = RabbitMQConfig.getInstance();
-    const producer = new Producer();
-    const consumer = new Consumer();
+    startApp();
   }
 
   const app = express();
@@ -73,4 +71,13 @@ if (cluster.isPrimary) {
         console.log(`Server running on port ${port}`);
     }
   );
+}
+
+async function startApp() {
+  const rabbitConnection = new RabbitMQConfig();
+  await rabbitConnection.initialize();
+  // console.log(rabbitConnection);
+  // Start your server or perform other actions here
+  const producer = new Producer(rabbitConnection.connection);
+  const consumer = new Consumer(rabbitConnection.connection);
 }
