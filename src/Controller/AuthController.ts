@@ -1,3 +1,4 @@
+import { SendEmailMessage } from "./../Services/Implementations/SendEmail/NodeMailer";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import {
@@ -33,6 +34,11 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       payload.UserName = username;
       const hash = await bcrypt.hash(payload.Password, 10);
       payload.Password = hash;
+      await SendEmailMessage(
+        "nifemiojinni22@gmail.com",
+        "Quickee Food Company",
+        "This is a test"
+      );
       const response = await AddToDB(stdTab, payload);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);

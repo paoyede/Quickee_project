@@ -17,8 +17,8 @@ export const SendEmailMessage = async (
   let transporter = nodemailer.createTransport(param);
 
   let mailOptions = {
-    from: `ArchIntel <${param.auth.user}>`,
-    to: `Alade ${to}`,
+    from: `Quickee <${param.auth.user}>`,
+    to: `Nifemi ${to}`,
     subject: subject,
     text: message,
     html: mail,
