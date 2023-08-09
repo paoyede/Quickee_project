@@ -2,9 +2,9 @@
 node_modules/
 
 # Ignore environment-specific files
-.env
-.env.local
-.env.production
+# .env
+# .env.local
+# .env.production
 
 # Ignore build artifacts
 build/
