@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { alterTableQuery, studentTable } from "../Database/DbUtilities";
+import {
+  alterTableQuery,
+  refreshTokenTable,
+  studentTable,
+} from "../Database/DbUtilities";
 import {
   AlterTable,
   CreateDatabase,
@@ -29,7 +33,7 @@ export const createDB = async (req: Request, res: Response) => {
 
 export const createTable = async (req: Request, res: Response) => {
   try {
-    const DbTab = CreateTable(studentTable);
+    const DbTab = CreateTable(refreshTokenTable);
     res.status(200).json(DbTab);
   } catch (error) {
     console.log(error);

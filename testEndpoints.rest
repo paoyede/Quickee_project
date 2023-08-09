@@ -23,3 +23,18 @@ Content-Type: application/json
     "University": "Elizade University",
     "UserName": ""
 }
+
+###
+
+POST {{url}}/Auth/SignIn
+Content-Type: application/json
+
+{
+    "FirstName": "Nifemi",
+    "LastName": "Ojinni",
+    "Email": "nifemiojinni22@gmail.com",
+    "Password": "@$Nifemi567",
+    "IsVerifiedEmail": true,
+    "University": "Elizade University",
+    "UserName": ""
+}
