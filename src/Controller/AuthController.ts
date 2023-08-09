@@ -92,7 +92,6 @@ export const signin = async (req: Request, res: Response) => {
       return res.status(200).json(success);
     }
   } catch (error) {
-    console.log(error);
     const errMessage = Message(500, InternalError);
     res.status(500).json(errMessage);
   }
