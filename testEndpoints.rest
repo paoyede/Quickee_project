@@ -11,7 +11,7 @@ GET {{url}}/DbOps/createdb?dbName=student
 ###
 GET {{url}}/DbOps/createtable
 ###
-POST {{url}}/Auth/SignUp
+POST {{url}}/Student/SignUp
 Content-Type: application/json
 
 {
@@ -26,10 +26,14 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/Auth/SignIn
+GET {{url}}/Student/SignIn
 Content-Type: application/json
 
 {
     "UserName": "Nifemi.Ojinni",
     "Password": "@$Nifemi567"
 }
+
+###
+
+GET {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com

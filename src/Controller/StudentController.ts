@@ -95,7 +95,7 @@ export const signin = async (req: Request, res: Response) => {
   }
 };
 
-export const forgetPassword = async (req: Request, res: Response) => {
+export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
     // console.log(userId);
@@ -105,8 +105,8 @@ export const forgetPassword = async (req: Request, res: Response) => {
       res.status(400).json(error);
     } else {
       const userId = isUserExist.Id;
-      const forgetDigit = generateSixDigitNumber();
-      const payload = { Id: userId, ForgotPin: forgetDigit };
+      const forgotDigit = generateSixDigitNumber();
+      const payload = { Id: userId, ForgotPin: forgotDigit };
       const forgot = "ForgotPassword";
       var checkForgot = await FirstOrDefault(forgot, "Id", userId);
       //await producer.publishMessage("testing");
