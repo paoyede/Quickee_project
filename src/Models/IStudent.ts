@@ -1,3 +1,8 @@
+export interface ISignIn {
+  UserName: string;
+  Password: string;
+}
+
 export interface ISignUp {
   FirstName: string;
   LastName: string;

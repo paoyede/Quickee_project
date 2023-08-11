@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import cors from "cors";
 import DbOpsRoute from "./Routes/DbRoute";
-import authRoute from "./Routes/AuthRoute";
+import authRoute from "./Routes/StudentRoute";
 import Producer from "./Services/Implementations/MessageBroker/Producer";
 import Consumer from "./Services/Implementations/MessageBroker/Consumer";
 import RabbitMQConfig from "./Services/Implementations/MessageBroker/Connection";

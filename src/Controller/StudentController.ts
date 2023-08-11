@@ -2,29 +2,27 @@ import {
   LoginSuccess,
   WrongPassword,
   userNotFound,
-} from "./../Response/Responses";
-import { ISignIn } from "./../Models/ISignIn";
+  CreateSuccess,
+  InternalError,
+  UserIsExist,
+  ResetLinkSent,
+} from "../Response/Responses";
+import { ISignIn } from "../Models/IStudent";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import {
   AddToDB,
-  AlterTable,
-  CreateDatabase,
-  CreateTable,
   FirstOrDefault,
   GetAll,
+  Update,
 } from "../Infrastructure/Repository";
-import {
-  CreateSuccess,
-  InternalError,
-  UserIsExist,
-} from "../Response/Responses";
 import { Message } from "../Response/IResponse";
-import { ISignUp } from "../Models/ISignUp";
+import { ISignUp } from "../Models/IStudent";
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../Services/Implementations/JwtService";
+import { generateSixDigitNumber } from "Utilities/RandomNumber";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -89,6 +87,36 @@ export const signin = async (req: Request, res: Response) => {
         refreshtoken: refreshtoken,
       };
       const success = Message(200, LoginSuccess, isUserExist, tokens);
+      return res.status(200).json(success);
+    }
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
+export const forgetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.params;
+    // console.log(userId);
+    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, userNotFound);
+      res.status(400).json(error);
+    } else {
+      const userId = isUserExist.Id;
+      const forgetDigit = generateSixDigitNumber();
+      const payload = { Id: userId, ForgotPin: forgetDigit };
+      const forgot = "ForgotPassword";
+      var checkForgot = await FirstOrDefault(forgot, "Id", userId);
+      //await producer.publishMessage("testing");
+      if (checkForgot === null) {
+        await AddToDB(forgot, payload);
+      } else {
+        delete payload.Id;
+        await Update(forgot, "Id", userId, payload);
+      }
+      const success = Message(200, LoginSuccess, isUserExist, ResetLinkSent);
       return res.status(200).json(success);
     }
   } catch (error) {

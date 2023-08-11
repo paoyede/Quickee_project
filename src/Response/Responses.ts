@@ -9,6 +9,8 @@ export const SchoolNotFound = "School not found";
 export const StaffNotFound = "Staff not found";
 export const StaffAlreadyExist = "Staff already exist";
 export const InvalidEmail = "Invalid email";
+export const ResetLinkSent =
+  "Link to reset password has been sent to your email";
 export const SchoolDeleted = (id: any) => {
   return `School with id ${id} has been deleted!`;
 };
