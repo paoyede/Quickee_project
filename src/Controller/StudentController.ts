@@ -97,8 +97,8 @@ export const signin = async (req: Request, res: Response) => {
 
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
-    const { email } = req.params;
-    // console.log(userId);
+    const email = req.query.email.toString();
+    console.log("email: ", email);
     var isUserExist = await FirstOrDefault(stdTab, dbId, email);
     if (isUserExist === null) {
       const error = Message(400, userNotFound);
