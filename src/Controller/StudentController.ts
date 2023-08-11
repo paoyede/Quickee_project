@@ -22,7 +22,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../Services/Implementations/JwtService";
-import { generateSixDigitNumber } from "Utilities/RandomNumber";
+import { generateSixDigitNumber } from "../Utilities/RandomNumber";
 
 const stdTab = "Student";
 const dbId = "Email";

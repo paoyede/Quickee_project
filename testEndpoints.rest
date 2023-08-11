@@ -36,4 +36,4 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
+POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
