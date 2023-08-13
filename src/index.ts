@@ -8,6 +8,7 @@ import compression from "compression";
 import cors from "cors";
 import DbOpsRoute from "./Routes/DbRoute";
 import studentRoute from "./Routes/StudentRoute";
+import kitchenRoute from "./Routes/KitchenRoute";
 import Producer from "./Services/Implementations/MessageBroker/Producer";
 import Consumer from "./Services/Implementations/MessageBroker/Consumer";
 import RabbitMQConfig from "./Services/Implementations/MessageBroker/Connection";
@@ -18,7 +19,8 @@ if (cluster.isPrimary) {
   // Fork workers equal to the number of CPU cores
   console.log("Number of CPU(s): ", numCPUs);
 
-  for (let i = 0; i < numCPUs; i++) {
+  // for (let i = 0; i < numCPUs; i++) {
+  for (let i = 0; i < 1; i++) {
     const createWorker = cluster.fork();
     console.log(
       `Worker with pid: ${createWorker.process.pid} has been created`
@@ -34,7 +36,7 @@ if (cluster.isPrimary) {
   });
 } else {
   if (cluster.worker.id === numCPUs) {
-    startApp();
+    // startApp();
   }
 
   const app = express();
@@ -45,6 +47,7 @@ if (cluster.isPrimary) {
   app.use(bodyParser.json());
   app.use("/DbOps", DbOpsRoute);
   app.use("/Student", studentRoute);
+  app.use("/Kitchen", kitchenRoute);
 
   app.get("/", (req: Request, res: Response) => {
     res.write("Hello Nifemi, my name is Quickee Food");
@@ -61,14 +64,14 @@ if (cluster.isPrimary) {
 
   const ip = "127.0.0.1";
   //   const ip = "192.168.137.1";
-  const port = 80;
-  // const port = 5000;
+  // const port = 80;
+  const port = 3000;
 
   server.listen(
     port,
     /* ip,*/ () => {
-      cluster.worker.id === numCPUs &&
-        console.log(`Server running on port ${port}`);
+      // cluster.worker.id === numCPUs &&
+      console.log(`Server running on port ${port}`);
     }
   );
 }

@@ -2,14 +2,14 @@
 ##@rtk1 = {{rtk}}
 @atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzcsImV4cCI6MTY4NzQ4MjczN30.sgxSM8_50mgHmURuVsieVCzTYijYudUMTI1PopjsHGI
 ###@atk1 = {{atk}}
-@url = http://54.211.76.116
+# @url = http://54.211.76.116
 # @url = http://192.168.186.240
-# @url = http://127.0.0.1:5000
+@url = http://127.0.0.1:3000
 
 ###
 # GET {{url}}/DbOps/createdb?dbName=student
 ###
-GET {{url}}/DbOps/createtable
+#GET {{url}}/DbOps/createtable
 ###
 POST {{url}}/Student/SignUp
 Content-Type: application/json
@@ -23,9 +23,7 @@ Content-Type: application/json
     "University": "Elizade University",
     "UserName": ""
 }
-
 ###
-
 GET {{url}}/Student/SignIn
 Content-Type: application/json
 
@@ -35,5 +33,62 @@ Content-Type: application/json
 }
 
 ###
-
+###
 POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
+###
+
+POST {{url}}/Kitchen/Create
+Content-Type: application/json
+
+{
+  "Name": "RaphaelFood",
+  "KitchenEmail": "support@raphaelfood.com",
+  "KitchenPassword": "Alade1&&&",
+  "Manager": "George Phillip",
+  "ManagerPhone": 23481035635487,
+  "AdminEmail": "Christi@gmail.com",
+  "AdminPassword": "Christi@567",
+  "University": "Elizade University, Ondo",
+  "AccountNumber": 1234567890,
+  "AccountName": "Raphael Food LTD",
+  "BankName": "CitiBank PLC"
+}
+
+###
+
+###
+GET {{url}}/Kitchen/SignIn
+Content-Type: application/json
+
+{
+  "Email": "support@raphaelfood.com",
+  "Password": "Alade1&&&",
+  "IsAdmin": false
+}
+
+###
+
+###
+PUT {{url}}/Kitchen/Update?email=support@raphaelfood.com
+Content-Type: application/json
+
+{
+  "ManagerPhone": 61982374629
+}
+###
+
+DELETE {{url}}/Kitchen/Delete?email=support@raphaelfood.com
+###
+
+POST {{url}}/Kitchen/CreateMenu
+Content-Type: application/json
+
+{
+  "KitchenId": "",
+  "FoodName": "",
+  "Category": "",
+  "Varieties": [],
+  "Price": 700,
+  "ImageUrl": "",
+  "Status": "",
+}

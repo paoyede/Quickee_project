@@ -98,7 +98,6 @@ export const signin = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const email = req.query.email.toString();
-    console.log("email: ", email);
     var isUserExist = await FirstOrDefault(stdTab, dbId, email);
     if (isUserExist === null) {
       const error = Message(400, userNotFound);
@@ -113,10 +112,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
       if (checkForgot === null) {
         await AddToDB(forgot, payload);
       } else {
-        delete payload.Id;
+        // delete payload.Id;
         await Update(forgot, "Id", userId, payload);
       }
-      const success = Message(200, LoginSuccess, isUserExist, ResetLinkSent);
+      const success = Message(200, ResetLinkSent, ResetLinkSent);
       return res.status(200).json(success);
     }
   } catch (error) {

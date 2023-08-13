@@ -115,19 +115,17 @@ export const Update = async (
 ): Promise<any> => {
   try {
     const paramPlaceholders = Object.keys(object)
-      .map((key, index) => `${key} = $${index + 1}`)
+      .map((key, index) => `"${key}" = $${index + 1}`)
       .join(", ");
     const paramValues = Object.values(object);
 
-    const updateQuery = `UPDATE "${tableName}" SET "${paramPlaceholders}" WHERE "${DbParam}" = $${
+    const updateQuery = `UPDATE "${tableName}" SET ${paramPlaceholders} WHERE "${DbParam}" = $${
       paramValues.length + 1
     } RETURNING *`;
 
     const saveChanges = await client.query(updateQuery, [...paramValues, Id]);
-
     return saveChanges.rows[0];
   } catch (error) {
-    // Handle the error appropriately
     console.error("Error in Update:", error);
     throw error;
   }
