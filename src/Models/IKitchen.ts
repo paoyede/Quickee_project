@@ -29,8 +29,7 @@ export interface CreateFoodMenu {
   KitchenId: string;
   FoodName: string;
   Category: string;
-  Varieties: string[];
+  Class: string;
   Price: number;
-  ImageUrl: string;
   Status: string;
 }

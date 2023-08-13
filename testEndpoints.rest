@@ -84,11 +84,15 @@ POST {{url}}/Kitchen/CreateMenu
 Content-Type: application/json
 
 {
-  "KitchenId": "",
-  "FoodName": "",
-  "Category": "",
-  "Varieties": [],
+  "KitchenId": "8fea4167-d8fc-4355-ac0c-126512eec58a",
+  "FoodName": "Ofada",
+  "Category": "Food",
+  "Class": "Rice",
   "Price": 700,
-  "ImageUrl": "",
-  "Status": "",
+  "Status": "available"
 }
+
+###
+GET {{url}}/Kitchen/Fetch?food=rice
+
+###

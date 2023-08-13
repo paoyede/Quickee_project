@@ -162,8 +162,8 @@ export const createFoodMenu = async (
     const kId = payload.FoodName;
     const kId2 = payload.KitchenId;
     const dbkId = "FoodName";
-    const dbkId2 = "KitchenId";
-    var isKitchenExist = await FirstOrDefault(kmTab, dbkId2, kId2);
+    const dbkId2 = "Id";
+    var isKitchenExist = await FirstOrDefault(kTab, dbkId2, kId2);
     var isFoodExist = await FirstOrDefault(kmTab, dbkId, kId);
     if (isKitchenExist === null) {
       const error = Message(400, KitchenNotFound);

@@ -27,7 +27,7 @@ export const kitchenTable =
 
 export const MenuTable =
   `CREATE TABLE "KitchenMenu" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "FoodName" TEXT, "Category" TEXT,` +
-  `"Varieties" TEXT[], "Price" BIGINT, "ImageUrl" VARCHAR, "Status" TEXT,` +
+  `"Class" TEXT, "Price" BIGINT, "Status" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const RevieTable =
