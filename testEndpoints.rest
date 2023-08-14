@@ -85,14 +85,34 @@ Content-Type: application/json
 
 {
   "KitchenId": "8fea4167-d8fc-4355-ac0c-126512eec58a",
-  "FoodName": "Ofada",
+  "FoodName": "Beans",
   "Category": "Food",
-  "Class": "Rice",
-  "Price": 700,
+  "Class": "Beans",
+  "Price": 1200,
   "Status": "available"
 }
 
 ###
+
+###
+PUT {{url}}/Kitchen/UpdateMenu?MenuId=3758bb9c-b36e-406e-a505-993b95e4065b
+Content-Type: application/json
+
+{
+  "Price": 850
+}
+###
+
+###
+
+DELETE {{url}}/Kitchen/DeleteMenu?MenuId=3758bb9c-b36e-406e-a505-993b95e4065b
+
+###
+
+GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=8fea4167-d8fc-4355-ac0c-126512eec58a
+
+###
+
 GET {{url}}/Kitchen/Fetch?food=rice
 
 ###

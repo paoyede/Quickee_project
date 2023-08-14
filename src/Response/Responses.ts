@@ -1,4 +1,4 @@
-export const userNotFound = "User not found";
+export const UserNotFound = "User not found";
 export const WrongPassword = "Incorrect Password";
 export const LoginSuccess = "login success";
 export const NullFields = "Please fill all entries";
@@ -6,6 +6,7 @@ export const InternalError = "Internal Server Error";
 export const CreateSuccess = "created successfully";
 export const UserIsExist = "User already exist";
 export const FoodIsExist = "Food already exist";
+export const FoodNotFound = "Food not found";
 export const SchoolNotFound = "School not found";
 export const StaffNotFound = "Staff not found";
 export const KitchenNotFound = "Kitchen not found";
@@ -18,6 +19,9 @@ export const SchoolDeleted = (id: any) => {
 };
 export const KitchenDeleted = (id: any) => {
   return `Kitchen with id ${id} has been deleted!`;
+};
+export const FoodMenuDeleted = (id: any) => {
+  return `FoodMenu with id ${id} has been deleted!`;
 };
 export const UpdateSuccess = "updated succesfully";
 export const FetchedSuccess = "fetched succesfully";

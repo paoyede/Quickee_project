@@ -3,15 +3,18 @@ import {
   IKitchenCreate,
   IKitchenLogin,
   IKitchenUpdate,
+  UpdateFoodMenu,
 } from "./../Models/IKitchen";
 import {
+  FetchedSuccess,
   FoodIsExist,
+  FoodMenuDeleted,
+  FoodNotFound,
   KitchenDeleted,
   KitchenNotFound,
   LoginSuccess,
   UpdateSuccess,
   WrongPassword,
-  userNotFound,
 } from "../Response/Responses";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
@@ -22,6 +25,7 @@ import {
   CreateTable,
   FirstOrDefault,
   GetAll,
+  GetAllById,
   Remove,
   Update,
 } from "../Infrastructure/Repository";
@@ -81,7 +85,7 @@ export const signin = async (req: Request, res: Response) => {
     var isUserExist = await FirstOrDefault(kTab, dbid, userId);
 
     if (isUserExist == null) {
-      const error = Message(400, userNotFound);
+      const error = Message(400, KitchenNotFound);
       res.status(400).json(error);
     } else {
       var userPassword = payload.IsAdmin
@@ -119,7 +123,7 @@ export const updateKitchen = async (req: Request, res: Response) => {
     const editedKitchen: IKitchenUpdate = req.body;
     const isKitchenExist = await FirstOrDefault(kTab, dbId, email);
     if (isKitchenExist == null) {
-      const error = Message(400, userNotFound);
+      const error = Message(400, KitchenNotFound);
       res.status(400).json(error);
     } else {
       compareAndUpdateProperties(editedKitchen, isKitchenExist);
@@ -140,7 +144,7 @@ export const deleteKitchen = async (req: Request, res: Response) => {
     const isKitchenExist = await FirstOrDefault(kTab, dbId, email);
 
     if (isKitchenExist == null) {
-      const error = Message(400, userNotFound);
+      const error = Message(400, KitchenNotFound);
       res.status(400).json(error);
     } else {
       await Remove(kTab, dbId, email);
@@ -181,6 +185,69 @@ export const createFoodMenu = async (
   } catch (error) {
     const err = Message(500, InternalError);
     res.status(500).json(err);
+  }
+};
+
+export const updateFoodMenu = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const payload: UpdateFoodMenu = req.body;
+    const menuId = req.query.MenuId.toString();
+    var isFoodExist = await FirstOrDefault(kmTab, "Id", menuId);
+    if (isFoodExist === null) {
+      const error = Message(400, FoodNotFound);
+      res.status(400).json(error);
+    } else {
+      const kitchenId = isFoodExist.KitchenId;
+      var isKitchenExist = await FirstOrDefault(kTab, "Id", kitchenId);
+
+      if (isKitchenExist === null) {
+        const error = Message(400, KitchenNotFound);
+        res.status(400).json(error);
+      } else {
+        // producer.publishMessage("This is a test");
+        const response = await Update(kmTab, "Id", menuId, payload);
+        const success = Message(200, UpdateSuccess, response);
+        res.status(200).json(success);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    const err = Message(500, InternalError);
+    res.status(500).json(err);
+  }
+};
+
+export const deleteFoodMenu = async (req: Request, res: Response) => {
+  try {
+    const menuId = req.query.MenuId.toString();
+    const isKitchenExist = await FirstOrDefault(kmTab, "Id", menuId);
+
+    if (isKitchenExist == null) {
+      const error = Message(400, KitchenNotFound);
+      res.status(400).json(error);
+    } else {
+      await Remove(kmTab, "Id", menuId);
+      res.status(200).json(FoodMenuDeleted(menuId));
+    }
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
+export const getKitchenMenusById = async (req: Request, res: Response) => {
+  try {
+    const menuId = req.query.KitchenId.toString();
+    const foodMenus = await GetAllById(kmTab, "KitchenId", menuId);
+
+    const success = Message(200, FetchedSuccess, foodMenus);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
   }
 };
 

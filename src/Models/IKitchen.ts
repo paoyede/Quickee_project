@@ -33,3 +33,11 @@ export interface CreateFoodMenu {
   Price: number;
   Status: string;
 }
+
+export interface UpdateFoodMenu {
+  FoodName?: string;
+  Category?: string;
+  Class?: string;
+  Price?: number;
+  Status?: string;
+}

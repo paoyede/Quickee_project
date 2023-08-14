@@ -1,7 +1,7 @@
 import {
   LoginSuccess,
   WrongPassword,
-  userNotFound,
+  UserNotFound,
   CreateSuccess,
   InternalError,
   UserIsExist,
@@ -63,7 +63,7 @@ export const signin = async (req: Request, res: Response) => {
     // console.log(userId);
     var isUserExist = await FirstOrDefault(stdTab, dbid2, userId);
     if (isUserExist == null) {
-      const error = Message(400, userNotFound);
+      const error = Message(400, UserNotFound);
       res.status(400).json(error);
     } else {
       const isMatched = await bcrypt.compare(
@@ -100,7 +100,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const email = req.query.email.toString();
     var isUserExist = await FirstOrDefault(stdTab, dbId, email);
     if (isUserExist === null) {
-      const error = Message(400, userNotFound);
+      const error = Message(400, UserNotFound);
       res.status(400).json(error);
     } else {
       const userId = isUserExist.Id;
