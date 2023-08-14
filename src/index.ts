@@ -19,8 +19,8 @@ if (cluster.isPrimary) {
   // Fork workers equal to the number of CPU cores
   console.log("Number of CPU(s): ", numCPUs);
 
-  // for (let i = 0; i < numCPUs; i++) {
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < numCPUs; i++) {
+    // for (let i = 0; i < 1; i++) {
     const createWorker = cluster.fork();
     console.log(
       `Worker with pid: ${createWorker.process.pid} has been created`
@@ -64,14 +64,14 @@ if (cluster.isPrimary) {
 
   const ip = "127.0.0.1";
   //   const ip = "192.168.137.1";
-  // const port = 80;
-  const port = 3000;
+  const port = 80;
+  // const port = 3000;
 
   server.listen(
     port,
     /* ip,*/ () => {
-      // cluster.worker.id === numCPUs &&
-      console.log(`Server running on port ${port}`);
+      cluster.worker.id === numCPUs &&
+        console.log(`Server running on port ${port}`);
     }
   );
 }
