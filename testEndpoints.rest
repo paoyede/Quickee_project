@@ -2,9 +2,9 @@
 ##@rtk1 = {{rtk}}
 @atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzcsImV4cCI6MTY4NzQ4MjczN30.sgxSM8_50mgHmURuVsieVCzTYijYudUMTI1PopjsHGI
 ###@atk1 = {{atk}}
-# @url = http://54.211.76.116
+@url = http://54.211.76.116
 # @url = http://192.168.186.240
-@url = http://127.0.0.1:3000
+# @url = http://127.0.0.1:3000
 
 ###
 # GET {{url}}/DbOps/createdb?dbName=student
@@ -24,6 +24,8 @@ Content-Type: application/json
     "UserName": ""
 }
 ###
+
+
 GET {{url}}/Student/SignIn
 Content-Type: application/json
 
