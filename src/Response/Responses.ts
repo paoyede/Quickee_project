@@ -12,6 +12,7 @@ export const StaffNotFound = "Staff not found";
 export const KitchenNotFound = "Kitchen not found";
 export const StaffAlreadyExist = "Staff already exist";
 export const InvalidEmail = "Invalid email";
+export const WrongOtp = "Wrong OTP";
 export const ResetLinkSent =
   "OTP to reset password has been sent to your email";
 export const SchoolDeleted = (id: any) => {

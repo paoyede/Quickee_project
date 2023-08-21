@@ -30,9 +30,24 @@ export const MenuTable =
   `"Class" TEXT, "Price" BIGINT, "Status" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
-export const RevieTable =
+export const ReviewTable =
   `CREATE TABLE "Review" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "Reviewer" TEXT, "Review" TEXT,` +
   `"AgreeCount" BIGINT, "DisagreeCount" BIGINT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const OrdersTable =
+  `CREATE TABLE "Orders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID PRIMARY KEY, "Name" TEXT,` +
+  `"Scoops" BIGINT, "Price" BIGINT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const PaymentsTable =
+  `CREATE TABLE "Payments" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "UserId" UUID, "OrderId" TEXT,` +
+  `"TrxRef" VARCHAR, "IsSuccess" BOOLEAN DEFAULT false,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const AllOrders =
+  `CREATE TABLE "AllUsersOrders" ("OrderId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "UserId" UUID,` +
+  `"TrxRef" VARCHAR, "IsPaid" BOOLEAN DEFAULT false, "Description" TEXT, "TotalAmount" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const ForgotPassword = `CREATE TABLE "ForgotPassword" ("Id" UUID PRIMARY KEY, "ForgotPin" VARCHAR(6))`;
