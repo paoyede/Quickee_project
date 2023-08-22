@@ -10,11 +10,17 @@ export interface ISignUp {
   Password: string;
   Email: string;
   UserName?: string;
+  VerificationCode?: string;
 }
 
 export interface IUpdatePassword {
   OTP: string;
   NewPassword: string;
+}
+
+export interface IVerifyEmail {
+  EmailOTP: string;
+  Email: string;
 }
 
 export interface IAllUsersOrders {

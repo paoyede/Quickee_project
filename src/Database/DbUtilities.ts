@@ -16,7 +16,7 @@ export const refreshTokenTable = `CREATE TABLE "RefreshToken" ("RefreshToken" TE
 
 export const studentTable =
   `CREATE TABLE "Student" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "FirstName" TEXT, "LastName" TEXT, "Email" TEXT,` +
-  `"Password" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false, "University" TEXT, "UserName" TEXT,` +
+  `"Password" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false, "University" TEXT, "UserName" TEXT, "VerificationCode" VARCHAR(6),` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const kitchenTable =

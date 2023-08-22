@@ -21,7 +21,7 @@ if (cluster.isPrimary) {
   console.log("Number of CPU(s): ", numCPUs);
 
   // for (let i = 0; i < numCPUs; i++) {
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < numCPUs; i++) {
     const createWorker = cluster.fork();
     console.log(
       `Worker with pid: ${createWorker.process.pid} has been created`
@@ -42,40 +42,54 @@ if (cluster.isPrimary) {
 
   const app = express();
 
-  app.use(cors({ credentials: true }));
-  app.use(compression());
-  app.use(cookieParser());
-  app.use(bodyParser.json());
-  app.use("/DbOps", DbOpsRoute);
-  app.use("/Student", studentRoute);
-  app.use("/Kitchen", kitchenRoute);
-  app.use("/Payment", paymentRoute);
+  const rabbitMQConfig = new RabbitMQConfig();
 
-  app.get("/", (req: Request, res: Response) => {
-    res.write("Hello Nifemi, my name is Quickee Food");
-    res.end();
-  });
+  rabbitMQConfig
+    .initialize()
+    .then(() => {
+      const producer =
+        cluster.worker.id === numCPUs &&
+        new Producer(rabbitMQConfig.connection);
+      const consumer = new Consumer(rabbitMQConfig.connection);
 
-  app.get("/signin", (req, res) => {
-    const { name } = req.query;
-    res.write(`Welcome ${name}`);
-    res.end();
-  });
+      app.use(cors({ credentials: true }));
+      app.use(compression());
+      app.use(cookieParser());
+      app.use(bodyParser.json());
+      app.use("/DbOps", DbOpsRoute);
+      app.use("/Student", studentRoute(producer));
+      app.use("/Kitchen", kitchenRoute);
+      app.use("/Payment", paymentRoute);
 
-  const server = http.createServer(app);
+      app.get("/", (req: Request, res: Response) => {
+        res.write("Hello Nifemi, my name is Quickee Food");
+        res.end();
+      });
 
-  const ip = "127.0.0.1";
-  //   const ip = "192.168.137.1";
-  // const port = 80;
-  const port = 3000;
+      app.get("/signin", (req, res) => {
+        const { name } = req.query;
+        res.write(`Welcome ${name}`);
+        res.end();
+      });
 
-  server.listen(
-    port,
-    /* ip,*/ () => {
-      // cluster.worker.id === numCPUs &&
-      console.log(`Server running on port ${port}`);
-    }
-  );
+      const server = http.createServer(app);
+
+      const ip = "127.0.0.1";
+      //   const ip = "192.168.137.1";
+      // const port = 80;
+      const port = 3000;
+
+      server.listen(
+        port,
+        /* ip,*/ () => {
+          cluster.worker.id === numCPUs &&
+            console.log(`Server running on port ${port}`);
+        }
+      );
+    })
+    .catch((error) => {
+      console.error("Error initializing RabbitMQ connection", error);
+    });
 }
 
 let producer: Producer, consumer: Consumer;

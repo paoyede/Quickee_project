@@ -1,4 +1,5 @@
 export const UserNotFound = "User not found";
+export const UnverifiedEmail = "Unverified email";
 export const WrongPassword = "Incorrect Password";
 export const LoginSuccess = "login success";
 export const NullFields = "Please fill all entries";

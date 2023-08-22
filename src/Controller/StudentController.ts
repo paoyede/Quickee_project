@@ -1,4 +1,9 @@
-import { IAllUsersOrders, IUpdatePassword } from "./../Models/IStudent";
+import { IEmailRequest } from "./../Models/IEmail";
+import {
+  IAllUsersOrders,
+  IUpdatePassword,
+  IVerifyEmail,
+} from "./../Models/IStudent";
 import {
   LoginSuccess,
   WrongPassword,
@@ -9,6 +14,7 @@ import {
   ResetLinkSent,
   WrongOtp,
   UpdateSuccess,
+  UnverifiedEmail,
 } from "../Response/Responses";
 import { IOrder, ISignIn } from "../Models/IStudent";
 import { Request, Response } from "express";
@@ -25,7 +31,12 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../Services/Implementations/JwtService";
-import { RandGenSixDigitNum, cryptoGenTrxRef } from "../Utilities/RandomNumber";
+import {
+  CryptoGenSixDigitNum,
+  RandGenSixDigitNum,
+  cryptoGenTrxRef,
+} from "../Utilities/RandomNumber";
+import Producer from "../Services/Implementations/MessageBroker/Producer";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -35,7 +46,13 @@ const ordTab = "Orders";
 const aOrdTab = "AllUsersOrders";
 const forgot = "ForgotPassword";
 
-export const signup = async (req: Request, res: Response): Promise<any> => {
+// const producer = new Producer();
+
+export const signup = async (
+  producer: Producer,
+  req: Request,
+  res: Response
+): Promise<any> => {
   try {
     const payload: ISignUp = req.body;
     const userId = payload.Email;
@@ -50,13 +67,27 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
     payload.UserName = username;
     const hash = await bcrypt.hash(payload.Password, 10);
     payload.Password = hash;
-    // producer.publishMessage("This is a test");
+    const vcode = "VerificationCode";
+    const genCode = await CryptoGenSixDigitNum(6, stdTab, vcode);
+    payload.VerificationCode = genCode;
+
     const response = await AddToDB(stdTab, payload);
+    delete response.VerificationCode;
     const success = Message(200, CreateSuccess, response);
-    res.status(200).json(success);
+
+    const rabbitmqPayload: IEmailRequest = {
+      Name: payload.LastName,
+      Code: genCode,
+      Reciever: payload.Email,
+      Type: "Email verification",
+    };
+
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
+    return res.status(200).json(success);
   } catch (error) {
     const err = Message(500, InternalError);
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -68,6 +99,11 @@ export const signin = async (req: Request, res: Response) => {
     var isUserExist = await FirstOrDefault(stdTab, dbid2, userId);
     if (isUserExist == null) {
       const error = Message(400, UserNotFound);
+      return res.status(400).json(error);
+    }
+
+    if (isUserExist.IsVerifiedEmail === false) {
+      const error = Message(400, UnverifiedEmail);
       return res.status(400).json(error);
     }
 
@@ -99,7 +135,11 @@ export const signin = async (req: Request, res: Response) => {
   }
 };
 
-export const forgotPassword = async (req: Request, res: Response) => {
+export const forgotPassword = async (
+  producer: Producer,
+  req: Request,
+  res: Response
+) => {
   try {
     const email = req.query.email.toString();
     var isUserExist = await FirstOrDefault(stdTab, dbId, email);
@@ -113,13 +153,23 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
     const payload = { Id: userId, ForgotPin: forgotDigit };
     var checkForgot = await FirstOrDefault(forgot, "Id", userId);
-    //await producer.publishMessage("testing");
+
     if (checkForgot === null) {
       await AddToDB(forgot, payload);
     } else {
       // delete payload.Id;
       await Update(forgot, "Id", userId, payload);
     }
+
+    const rabbitmqPayload: IEmailRequest = {
+      Name: isUserExist.LastName,
+      Code: forgotDigit,
+      Reciever: email,
+      Type: "Reset password",
+    };
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
+
     const success = Message(200, ResetLinkSent, ResetLinkSent);
     return res.status(200).json(success);
   } catch (error) {
@@ -141,6 +191,31 @@ export const updatePassword = async (req: Request, res: Response) => {
     const hash = await bcrypt.hash(payload.NewPassword, 10);
     const newPassword = { Password: hash };
     await Update(stdTab, "Id", userId, newPassword);
+
+    const success = Message(200, UpdateSuccess);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const payload: IVerifyEmail = req.body;
+    var isUserExist = await FirstOrDefault(stdTab, dbId, payload.Email);
+    if (isUserExist === null) {
+      const error = Message(400, UserNotFound);
+      return res.status(400).json(error);
+    }
+
+    if (isUserExist.VerificationCode != payload.EmailOTP) {
+      const error = Message(400, WrongOtp);
+      return res.status(400).json(error);
+    }
+
+    const updateEmail = { UpdatedAt: new Date(), IsVerifiedEmail: true };
+    await Update(stdTab, dbId, payload.Email, updateEmail);
 
     const success = Message(200, UpdateSuccess);
     return res.status(200).json(success);
@@ -180,7 +255,7 @@ export const saveOrders = async (
       await AddToDB(ordTab, eachOrder);
     }
 
-    const newResponse = { Reference: allOrderData.TrxRef };
+    const newResponse = { OrderId: saveToAllorders.OrderId };
     const success = Message(200, CreateSuccess, newResponse);
     res.status(200).json(success);
   } catch (error) {

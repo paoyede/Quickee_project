@@ -11,6 +11,7 @@
 ###
 #GET {{url}}/DbOps/createtable
 ###
+
 POST {{url}}/Student/SignUp
 Content-Type: application/json
 
@@ -19,12 +20,28 @@ Content-Type: application/json
     "LastName": "Ojinni",
     "Email": "nifemiojinni22@gmail.com",
     "Password": "@$Nifemi567",
-    "IsVerifiedEmail": true,
+    "IsVerifiedEmail": false,
     "University": "Elizade University",
     "UserName": ""
 }
+
+# POST {{url}}/Student/SignUp
+# Content-Type: application/json
+
+# {
+#     "FirstName": "Raphael",
+#     "LastName": "Olaiyapo",
+#     "Email": "raphael.tunji@yahoo.com",
+#     "Password": "Alade1&&&",
+#     "IsVerifiedEmail": false,
+#     "University": "Elizade University",
+#     "UserName": ""
+# }
+
+
 ###
 
+###
 
 GET {{url}}/Student/SignIn
 Content-Type: application/json
@@ -35,7 +52,21 @@ Content-Type: application/json
 }
 
 ###
+
 ###
+
+PUT {{url}}/Student/VerifyEmail
+Content-Type: application/json
+
+{
+   "EmailOTP": "018810",
+   "Email": "nifemiojinni22@gmail.com"
+}
+
+###
+
+
+
 POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
 ###
 
@@ -45,7 +76,7 @@ PUT {{url}}/Student/UpdatePassword
 Content-Type: application/json
 
 {
-  "OTP": "134164",
+  "OTP": "815730",
   "NewPassword": "@$Nifemi567"
 }
 
@@ -59,15 +90,15 @@ Content-Type: application/json
 {
   "KitchenId": "8fea4167-d8fc-4355-ac0c-126512eec58a",
   "UserId": "48a4d227-e28a-4dab-9f35-1f25a6778bf1",
-  "Description": "separate the chicken",
+  "Description": "Mix egusi and okro soup together",
   "Items": [
     {
-      "Name": "Fried rice",
-      "Price": 600,
+      "Name": "Amala",
+      "Price": 800,
       "Scoops": 2
     },
     {
-      "Name": "Jollof rice",
+      "Name": "Egusi soup",
       "Price": 600,
       "Scoops": 2
     },
@@ -77,7 +108,7 @@ Content-Type: application/json
       "Scoops": 1
     },
     {
-      "Name": "Plastic Coke",
+      "Name": "Okro soup",
       "Price": 300,
       "Scoops": 1
     }
