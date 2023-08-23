@@ -86,31 +86,31 @@ export const signin = async (req: Request, res: Response) => {
 
     if (isUserExist == null) {
       const error = Message(400, KitchenNotFound);
-      res.status(400).json(error);
-    } else {
-      var userPassword = payload.IsAdmin
-        ? isUserExist.AdminPassword
-        : isUserExist.KitchenPassword;
-      const isMatched = await bcrypt.compare(payload.Password, userPassword);
-      if (!isMatched) {
-        const error = Message(400, WrongPassword);
-        return res.status(400).json(error);
-      }
-      const jwtPayLoad = { Email: payload.Email, Id: isUserExist.Id };
-      const refreshtoken = generateRefreshToken(jwtPayLoad);
-      const accesstoken = generateAccessToken(jwtPayLoad);
-      //save refresh token
-      const newRToken = { RefreshToken: refreshtoken };
-      await AddToDB(rtokTab, newRToken);
-      //await producer.publishMessage("testing");
-      //------------------
-      const tokens = {
-        accesstoken: accesstoken,
-        refreshtoken: refreshtoken,
-      };
-      const success = Message(200, LoginSuccess, isUserExist, tokens);
-      return res.status(200).json(success);
+      return res.status(400).json(error);
     }
+
+    var userPassword = payload.IsAdmin
+      ? isUserExist.AdminPassword
+      : isUserExist.KitchenPassword;
+    const isMatched = await bcrypt.compare(payload.Password, userPassword);
+    if (!isMatched) {
+      const error = Message(400, WrongPassword);
+      return res.status(400).json(error);
+    }
+    const jwtPayLoad = { Email: payload.Email, Id: isUserExist.Id };
+    const refreshtoken = generateRefreshToken(jwtPayLoad);
+    const accesstoken = generateAccessToken(jwtPayLoad);
+    //save refresh token
+    const newRToken = { RefreshToken: refreshtoken };
+    await AddToDB(rtokTab, newRToken);
+    //await producer.publishMessage("testing");
+    //------------------
+    const tokens = {
+      accesstoken: accesstoken,
+      refreshtoken: refreshtoken,
+    };
+    const success = Message(200, LoginSuccess, isUserExist, tokens);
+    return res.status(200).json(success);
   } catch (error) {
     const errMessage = Message(500, InternalError);
     res.status(500).json(errMessage);
@@ -240,8 +240,15 @@ export const deleteFoodMenu = async (req: Request, res: Response) => {
 
 export const getKitchenMenusById = async (req: Request, res: Response) => {
   try {
-    const menuId = req.query.KitchenId.toString();
-    const foodMenus = await GetAllById(kmTab, "KitchenId", menuId);
+    const kitchenId = req.query.KitchenId.toString();
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kitchenId);
+
+    if (isKitchenExist === null) {
+      const error = Message(400, KitchenNotFound);
+      return res.status(400).json(error);
+    }
+
+    const foodMenus = await GetAllById(kmTab, "KitchenId", kitchenId);
 
     const success = Message(200, FetchedSuccess, foodMenus);
     return res.status(200).json(success);

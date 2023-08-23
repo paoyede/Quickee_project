@@ -1,3 +1,4 @@
+import { authtoken } from "./../Middleware/TokenAuth";
 import {
   makepaystack_payment,
   verifypaystack_payment,
@@ -7,7 +8,7 @@ import { Router } from "express";
 const router: Router = Router();
 /* HTTP REQUEST */
 
-router.post("/MakePayment", makepaystack_payment);
-router.get("/VerifyPayment", verifypaystack_payment);
+router.post("/MakePayment", authtoken, makepaystack_payment);
+router.get("/VerifyPayment", authtoken, verifypaystack_payment);
 
 export default router;

@@ -9,6 +9,7 @@ import {
 } from "../Controller/StudentController";
 import { Request, Response, Router } from "express";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
+import { authtoken } from "../Middleware/TokenAuth";
 
 const studentRoute = (producer: Producer) => {
   const router: Router = Router();
@@ -18,13 +19,13 @@ const studentRoute = (producer: Producer) => {
     signup(producer, req, res)
   ); // Pass the producer instance
   // router.post("/SignUp", signup);
-  router.get("/SignIn", signin);
+  router.post("/SignIn", signin);
   router.put("/VerifyEmail", verifyEmail);
   router.post("/ForgotPassword", (req: Request, res: Response) =>
     forgotPassword(producer, req, res)
   );
   router.put("/UpdatePassword", updatePassword);
-  router.post("/SaveOrders", saveOrders);
+  router.post("/SaveOrders", authtoken, saveOrders);
 
   return router;
 };

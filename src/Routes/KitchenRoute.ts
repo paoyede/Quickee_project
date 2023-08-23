@@ -1,3 +1,4 @@
+import { authtoken } from "./../Middleware/TokenAuth";
 import {
   createFoodMenu,
   createKitchen,
@@ -14,11 +15,11 @@ const router: Router = Router();
 
 router.post("/Create", createKitchen);
 router.get("/SignIn", signin);
-router.put("/Update", updateKitchen);
+router.put("/Update", authtoken, updateKitchen);
 router.delete("/Delete", deleteKitchen);
-router.post("/CreateMenu", createFoodMenu);
-router.put("/UpdateMenu", updateFoodMenu);
-router.delete("/DeleteMenu", deleteFoodMenu);
-router.get("/GetKitchenMenus", getKitchenMenusById);
+router.post("/CreateMenu", authtoken, createFoodMenu);
+router.put("/UpdateMenu", authtoken, updateFoodMenu);
+router.delete("/DeleteMenu", authtoken, deleteFoodMenu);
+router.get("/GetKitchenMenus", authtoken, getKitchenMenusById);
 
 export default router;

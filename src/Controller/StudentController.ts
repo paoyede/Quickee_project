@@ -95,16 +95,16 @@ export const signin = async (req: Request, res: Response) => {
   try {
     const payload: ISignIn = req.body;
     const userId = payload.UserName;
-    // console.log(userId);
     var isUserExist = await FirstOrDefault(stdTab, dbid2, userId);
-    if (isUserExist == null) {
+
+    if (isUserExist === null) {
       const error = Message(400, UserNotFound);
       return res.status(400).json(error);
     }
 
     if (isUserExist.IsVerifiedEmail === false) {
-      const error = Message(400, UnverifiedEmail);
-      return res.status(400).json(error);
+      const error = Message(403, UnverifiedEmail);
+      return res.status(403).json(error);
     }
 
     const isMatched = await bcrypt.compare(
@@ -127,6 +127,7 @@ export const signin = async (req: Request, res: Response) => {
       accesstoken: accesstoken,
       refreshtoken: refreshtoken,
     };
+    delete isUserExist.VerificationCode;
     const success = Message(200, LoginSuccess, isUserExist, tokens);
     return res.status(200).json(success);
   } catch (error) {
