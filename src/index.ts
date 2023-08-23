@@ -19,14 +19,18 @@ const numCPUs = cpus().length;
 if (cluster.isPrimary) {
   // Fork workers equal to the number of CPU cores
   console.log("Number of CPU(s): ", numCPUs);
+  // startApp();
 
-  // for (let i = 0; i < numCPUs; i++) {
+  let allworkers: number[] = [];
   for (let i = 0; i < numCPUs; i++) {
     const createWorker = cluster.fork();
-    console.log(
-      `Worker with pid: ${createWorker.process.pid} has been created`
-    );
+    allworkers.push(createWorker.process.pid);
   }
+
+  let workers = allworkers.join(", ");
+  console.log(
+    `${allworkers.length} Workers with pid(s): ${workers} have been created`
+  );
 
   cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker with pid: ${worker.process.pid} just died`);
@@ -36,10 +40,6 @@ if (cluster.isPrimary) {
     );
   });
 } else {
-  if (cluster.worker.id === numCPUs) {
-    // startApp();
-  }
-
   const app = express();
 
   const rabbitMQConfig = new RabbitMQConfig();
@@ -50,7 +50,7 @@ if (cluster.isPrimary) {
       const producer =
         cluster.worker.id === numCPUs &&
         new Producer(rabbitMQConfig.connection);
-      const consumer = new Consumer(rabbitMQConfig.connection);
+      new Consumer(rabbitMQConfig.connection);
 
       app.use(cors({ credentials: true }));
       app.use(compression());
@@ -76,8 +76,8 @@ if (cluster.isPrimary) {
 
       const ip = "127.0.0.1";
       //   const ip = "192.168.137.1";
-      // const port = 80;
-      const port = 3000;
+      const port = 80;
+      // const port = 3000;
 
       server.listen(
         port,
@@ -95,10 +95,10 @@ if (cluster.isPrimary) {
 let producer: Producer, consumer: Consumer;
 async function startApp() {
   const rabbitConnection = new RabbitMQConfig();
-  await rabbitConnection.initialize();
+  await rabbitConnection.initialize().catch((error) => {
+    console.error("Error initializing RabbitMQ connection", error);
+  });
   // Start your server or perform other actions here
   producer = new Producer(rabbitConnection.connection);
   consumer = new Consumer(rabbitConnection.connection);
 }
-
-// export { producer, consumer };

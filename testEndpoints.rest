@@ -26,17 +26,17 @@ Content-Type: application/json
 }
 
 # POST {{url}}/Student/SignUp
-Content-Type: application/json
+# Content-Type: application/json
 
-{
-    "FirstName": "Raphael",
-    "LastName": "Olaiyapo",
-    "Email": "raphael.tunji@yahoo.com",
-    "Password": "Alade1&&&",
-    "IsVerifiedEmail": false,
-    "University": "Elizade University",
-    "UserName": ""
-}
+# {
+#     "FirstName": "Raphael",
+#     "LastName": "Olaiyapo",
+#     "Email": "raphael.tunji@yahoo.com",
+#     "Password": "Alade1&&&",
+#     "IsVerifiedEmail": false,
+#     "University": "Elizade University",
+#     "UserName": ""
+# }
 
 
 ###

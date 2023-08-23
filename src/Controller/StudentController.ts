@@ -62,6 +62,7 @@ export const signup = async (
       const error = Message(400, UserIsExist);
       return res.status(400).json(error);
     }
+
     const username = (payload.UserName =
       payload.FirstName + "." + payload.LastName);
     payload.UserName = username;
