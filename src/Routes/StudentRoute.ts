@@ -1,10 +1,10 @@
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import {
   forgotPassword,
+  resetPassword,
   saveOrders,
   signin,
   signup,
-  updatePassword,
   verifyEmail,
 } from "../Controller/StudentController";
 import { Request, Response, Router } from "express";
@@ -24,7 +24,7 @@ const studentRoute = (producer: Producer) => {
   router.post("/ForgotPassword", (req: Request, res: Response) =>
     forgotPassword(producer, req, res)
   );
-  router.put("/UpdatePassword", updatePassword);
+  router.put("/ResetPassword", resetPassword);
   router.post("/SaveOrders", authtoken, saveOrders);
 
   return router;

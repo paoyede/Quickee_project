@@ -15,6 +15,7 @@ import {
   WrongOtp,
   UpdateSuccess,
   UnverifiedEmail,
+  ExpiredOTP,
 } from "../Response/Responses";
 import { IOrder, ISignIn } from "../Models/IStudent";
 import { Request, Response } from "express";
@@ -71,17 +72,27 @@ export const signup = async (
     const vcode = "VerificationCode";
     const genCode = await CryptoGenSixDigitNum(6, stdTab, vcode);
     payload.VerificationCode = genCode;
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+    payload.ExpiresAt = currentTime;
 
     const response = await AddToDB(stdTab, payload);
     delete response.VerificationCode;
+    delete response.ExpiresAt;
     const success = Message(200, CreateSuccess, response);
 
     const rabbitmqPayload: IEmailRequest = {
-      Name: payload.LastName,
-      Code: genCode,
-      Reciever: payload.Email,
+      EmailTemplate: "studentreg",
       Type: "Email verification",
+      Name: payload.LastName,
+      Payload: new Map([["Code", genCode]]),
+      Reciever: payload.Email,
     };
+
+    // Convert the Map to an array of key-value pairs
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    // Update the original object with the array
+    rabbitmqPayload.Payload = payloadArray;
 
     const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
     producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
@@ -129,6 +140,7 @@ export const signin = async (req: Request, res: Response) => {
       refreshtoken: refreshtoken,
     };
     delete isUserExist.VerificationCode;
+    delete isUserExist.ExpiresAt;
     const success = Message(200, LoginSuccess, isUserExist, tokens);
     return res.status(200).json(success);
   } catch (error) {
@@ -151,24 +163,37 @@ export const forgotPassword = async (
     }
 
     const forgot = "ForgotPassword";
-    const userId = isUserExist.Id;
+    const userEmail = isUserExist.Email;
     const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
-    const payload = { Id: userId, ForgotPin: forgotDigit };
-    var checkForgot = await FirstOrDefault(forgot, "Id", userId);
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+    const payload = {
+      UserEmail: userEmail,
+      ForgotPin: forgotDigit,
+      ExpiresAt: currentTime,
+    };
+    var checkForgot = await FirstOrDefault(forgot, "UserEmail", userEmail);
 
     if (checkForgot === null) {
       await AddToDB(forgot, payload);
     } else {
       // delete payload.Id;
-      await Update(forgot, "Id", userId, payload);
+      await Update(forgot, "UserEmail", userEmail, payload);
     }
 
     const rabbitmqPayload: IEmailRequest = {
-      Name: isUserExist.LastName,
-      Code: forgotDigit,
-      Reciever: email,
+      EmailTemplate: "forgotpassword",
       Type: "Reset password",
+      Name: isUserExist.LastName,
+      Payload: new Map([["Code", forgotDigit]]),
+      Reciever: email,
     };
+
+    // Convert the Map to an array of key-value pairs
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    // Update the original object with the array
+    rabbitmqPayload.Payload = payloadArray;
+
     const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
     producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
 
@@ -180,19 +205,24 @@ export const forgotPassword = async (
   }
 };
 
-export const updatePassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: Request, res: Response) => {
   try {
     const payload: IUpdatePassword = req.body;
     var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
-    if (isOtpExist === null) {
+    if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
       const error = Message(400, WrongOtp);
       return res.status(400).json(error);
     }
 
-    const userId = isOtpExist.Id;
+    if (isOtpExist.ExpiresAt < new Date()) {
+      const error = Message(400, ExpiredOTP);
+      return res.status(400).json(error);
+    }
+
+    const userId = isOtpExist.UserEmail;
     const hash = await bcrypt.hash(payload.NewPassword, 10);
     const newPassword = { Password: hash };
-    await Update(stdTab, "Id", userId, newPassword);
+    await Update(stdTab, "Email", userId, newPassword);
 
     const success = Message(200, UpdateSuccess);
     return res.status(200).json(success);
@@ -213,6 +243,11 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     if (isUserExist.VerificationCode != payload.EmailOTP) {
       const error = Message(400, WrongOtp);
+      return res.status(400).json(error);
+    }
+
+    if (isUserExist.ExpiresAt < new Date()) {
+      const error = Message(400, ExpiredOTP);
       return res.status(400).json(error);
     }
 

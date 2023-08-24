@@ -10,6 +10,8 @@ export interface IKitchenCreate {
   AccountNumber: number;
   AccountName: string;
   BankName: string;
+  VerificationCode?: string;
+  ExpiresAt?: Date;
 }
 
 export interface IKitchenUpdate {

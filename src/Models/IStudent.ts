@@ -11,9 +11,11 @@ export interface ISignUp {
   Email: string;
   UserName?: string;
   VerificationCode?: string;
+  ExpiresAt?: Date;
 }
 
 export interface IUpdatePassword {
+  Email: string;
   OTP: string;
   NewPassword: string;
 }

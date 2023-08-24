@@ -6,6 +6,7 @@ import {
   UpdateFoodMenu,
 } from "./../Models/IKitchen";
 import {
+  ExpiredOTP,
   FetchedSuccess,
   FoodIsExist,
   FoodMenuDeleted,
@@ -13,16 +14,17 @@ import {
   KitchenDeleted,
   KitchenNotFound,
   LoginSuccess,
+  ResetLinkSent,
+  UnverifiedEmail,
   UpdateSuccess,
+  UserNotFound,
+  WrongOtp,
   WrongPassword,
 } from "../Response/Responses";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import {
   AddToDB,
-  AlterTable,
-  CreateDatabase,
-  CreateTable,
   FirstOrDefault,
   GetAll,
   GetAllById,
@@ -39,15 +41,23 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../Services/Implementations/JwtService";
-import client from "Database/Postgres";
+import {
+  CryptoGenSixDigitNum,
+  RandGenSixDigitNum,
+} from "../Utilities/RandomNumber";
+import { IEmailRequest } from "../Models/IEmail";
+import Producer from "../Services/Implementations/MessageBroker/Producer";
+import { IUpdatePassword, IVerifyEmail } from "../Models/IStudent";
 
 const kTab = "Kitchen";
 const kmTab = "KitchenMenu";
 const dbId = "KitchenEmail";
 const dbid2 = "AdminEmail";
 const rtokTab = "RefreshToken";
+const forgot = "ForgotPassword";
 
 export const createKitchen = async (
+  producer: Producer,
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -64,7 +74,28 @@ export const createKitchen = async (
       payload.KitchenPassword = hash;
       const hash2 = await bcrypt.hash(payload.AdminPassword, 10);
       payload.AdminPassword = hash2;
-      // producer.publishMessage("This is a test");
+      const vcode = "VerificationCode";
+      const genCode = await CryptoGenSixDigitNum(6, kTab, vcode);
+      payload.VerificationCode = genCode;
+      const currentTime = new Date();
+      currentTime.setMinutes(currentTime.getMinutes() + 5);
+      payload.ExpiresAt = currentTime;
+
+      const rabbitmqPayload: IEmailRequest = {
+        EmailTemplate: "kitchenreg",
+        Type: "Email verification",
+        Name: payload.Name,
+        Payload: new Map([["Code", genCode]]),
+        Reciever: payload.KitchenEmail,
+      };
+
+      // Convert the Map to an array of key-value pairs
+      const payloadArray = Array.from(rabbitmqPayload.Payload);
+      // Update the original object with the array
+      rabbitmqPayload.Payload = payloadArray;
+
+      const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+      producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
       const response = await AddToDB(kTab, payload);
       const success = Message(200, CreateSuccess, response);
       res.status(200).json(success);
@@ -87,6 +118,11 @@ export const signin = async (req: Request, res: Response) => {
     if (isUserExist == null) {
       const error = Message(400, KitchenNotFound);
       return res.status(400).json(error);
+    }
+
+    if (isUserExist.IsVerifiedEmail === false) {
+      const error = Message(403, UnverifiedEmail);
+      return res.status(403).json(error);
     }
 
     var userPassword = payload.IsAdmin
@@ -117,6 +153,132 @@ export const signin = async (req: Request, res: Response) => {
   }
 };
 
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const payload: IVerifyEmail = req.body;
+    var isUserExist = await FirstOrDefault(kTab, dbId, payload.Email);
+    if (isUserExist === null) {
+      const error = Message(400, UserNotFound);
+      return res.status(400).json(error);
+    }
+
+    if (isUserExist.VerificationCode != payload.EmailOTP) {
+      const error = Message(400, WrongOtp);
+      return res.status(400).json(error);
+    }
+
+    if (isUserExist.ExpiresAt < new Date()) {
+      const error = Message(400, ExpiredOTP);
+      return res.status(400).json(error);
+    }
+
+    const updateEmail = { UpdatedAt: new Date(), IsVerifiedEmail: true };
+    await Update(kTab, dbId, payload.Email, updateEmail);
+
+    const success = Message(200, UpdateSuccess);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
+export const forgotPassword = async (
+  producer: Producer,
+  req: Request,
+  res: Response
+) => {
+  try {
+    const email = req.query.email.toString();
+    var isUserExist = await FirstOrDefault(kTab, dbId, email);
+    isUserExist =
+      isUserExist === null
+        ? await FirstOrDefault(kTab, dbid2, email)
+        : isUserExist;
+
+    if (isUserExist === null) {
+      const error = Message(400, UserNotFound);
+      return res.status(400).json(error);
+    }
+
+    const forgot = "ForgotPassword";
+    const userEmail = isUserExist.Email;
+    const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+    const payload = {
+      UserEmail: userEmail,
+      ForgotPin: forgotDigit,
+      ExpiresAt: currentTime,
+    };
+    var checkForgot = await FirstOrDefault(forgot, "UserEmail", userEmail);
+
+    if (checkForgot === null) {
+      await AddToDB(forgot, payload);
+    } else {
+      // delete payload.Id;
+      await Update(forgot, "UserEmail", userEmail, payload);
+    }
+
+    const rabbitmqPayload: IEmailRequest = {
+      EmailTemplate: "forgotpassword",
+      Type: "Reset password",
+      Name: isUserExist.LastName,
+      Payload: new Map([["Code", forgotDigit]]),
+      Reciever: email,
+    };
+
+    // Convert the Map to an array of key-value pairs
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    // Update the original object with the array
+    rabbitmqPayload.Payload = payloadArray;
+
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
+
+    const success = Message(200, ResetLinkSent);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const payload: IUpdatePassword = req.body;
+    var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
+    if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
+      const error = Message(400, WrongOtp);
+      return res.status(400).json(error);
+    }
+
+    if (isOtpExist.ExpiresAt < new Date()) {
+      const error = Message(400, ExpiredOTP);
+      return res.status(400).json(error);
+    }
+
+    const userId = isOtpExist.UserEmail;
+    const hash = await bcrypt.hash(payload.NewPassword, 10);
+    const newPassword = { Password: hash };
+    var isUserKitchen = await FirstOrDefault(kTab, dbId, userId);
+    var isUserAdmin = await FirstOrDefault(kTab, dbid2, userId);
+    let dbParam =
+      isUserKitchen != null && isUserAdmin === null
+        ? dbId
+        : isUserKitchen === null && isUserAdmin != null
+        ? dbid2
+        : "";
+
+    if (dbParam != "") await Update(kTab, dbParam, userId, newPassword);
+    const success = Message(200, UpdateSuccess);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
 export const updateKitchen = async (req: Request, res: Response) => {
   try {
     const email = req.query.email.toString();
@@ -124,14 +286,14 @@ export const updateKitchen = async (req: Request, res: Response) => {
     const isKitchenExist = await FirstOrDefault(kTab, dbId, email);
     if (isKitchenExist == null) {
       const error = Message(400, KitchenNotFound);
-      res.status(400).json(error);
-    } else {
-      compareAndUpdateProperties(editedKitchen, isKitchenExist);
-      const update = await Update(kTab, dbId, email, isKitchenExist);
-      const response = Message(200, UpdateSuccess, update);
-
-      res.status(200).json(response);
+      return res.status(400).json(error);
     }
+
+    compareAndUpdateProperties(editedKitchen, isKitchenExist);
+    const update = await Update(kTab, dbId, email, isKitchenExist);
+    const response = Message(200, UpdateSuccess, update);
+
+    return res.status(200).json(response);
   } catch (error) {
     const errMessage = Message(500, InternalError);
     res.status(500).json(errMessage);

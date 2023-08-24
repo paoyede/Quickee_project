@@ -58,7 +58,7 @@ if (cluster.isPrimary) {
       app.use(bodyParser.json());
       app.use("/DbOps", DbOpsRoute);
       app.use("/Student", studentRoute(producer));
-      app.use("/Kitchen", kitchenRoute);
+      app.use("/Kitchen", kitchenRoute(producer));
       app.use("/Payment", paymentRoute);
 
       app.get("/", (req: Request, res: Response) => {
@@ -76,8 +76,8 @@ if (cluster.isPrimary) {
 
       const ip = "127.0.0.1";
       //   const ip = "192.168.137.1";
-      const port = 80;
-      // const port = 3000;
+      // const port = 80;
+      const port = 3000;
 
       server.listen(
         port,

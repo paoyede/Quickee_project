@@ -17,12 +17,12 @@ export const refreshTokenTable = `CREATE TABLE "RefreshToken" ("RefreshToken" TE
 export const studentTable =
   `CREATE TABLE "Student" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "FirstName" TEXT, "LastName" TEXT, "Email" TEXT,` +
   `"Password" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false, "University" TEXT, "UserName" TEXT, "VerificationCode" VARCHAR(6),` +
-  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+  `"ExpiresAt" TIMESTAMP, "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const kitchenTable =
   `CREATE TABLE "Kitchen" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "Name" TEXT, "KitchenEmail" TEXT, "KitchenPassword" VARCHAR,` +
   `"Manager" TEXT, "ManagerPhone" BIGINT, "AdminEmail" VARCHAR, "AdminPassword" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
-  `"University" TEXT, "AccountNumber" BIGINT, "AccountName" TEXT, "BankName" TEXT,` +
+  `"University" TEXT, "AccountNumber" BIGINT, "AccountName" TEXT, "BankName" TEXT, "VerificationCode" VARCHAR(6), "ExpiresAt" TIMESTAMP,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const MenuTable =
@@ -50,4 +50,4 @@ export const AllOrders =
   `"TrxRef" VARCHAR, "IsPaid" BOOLEAN DEFAULT false, "Description" TEXT, "TotalAmount" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
-export const ForgotPassword = `CREATE TABLE "ForgotPassword" ("Id" UUID PRIMARY KEY, "ForgotPin" VARCHAR(6))`;
+export const ForgotPassword = `CREATE TABLE "ForgotPassword" ("UserEmail" UUID PRIMARY KEY, "ForgotPin" VARCHAR(6)), "ExpiresAt" TIMESTAMP)`;

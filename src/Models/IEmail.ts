@@ -1,7 +1,7 @@
 export interface IEmailRequest {
+  EmailTemplate: string;
   Type: string;
-  Payload?: Map<string, any>;
+  Payload?: any; // it is a Map<string, any>
   Reciever: string;
-  Code: string;
   Name: string;
 }

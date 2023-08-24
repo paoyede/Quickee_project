@@ -172,7 +172,7 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/Kitchen/SignIn
+POST {{url}}/Kitchen/SignIn
 Content-Type: application/json
 
 {
