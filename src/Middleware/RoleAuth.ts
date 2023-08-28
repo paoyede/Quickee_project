@@ -1,4 +1,4 @@
-import { ROLE_ARRAY } from "../Data/Role";
+// import { ROLE_ARRAY } from "../Data/Role";
 import { Request, Response, NextFunction } from "express";
 import { FirstOrDefault } from "../Infrastructure/Repository";
 
@@ -25,24 +25,24 @@ export const authuser = (
   next();
 };
 
-export const authrole = (start = 0, end = 2) => {
-  return async (
-    req: CustomRequest<IUser>, // Use the custom Request type
-    res: Response<any, Record<string, any>>,
-    next: NextFunction
-  ): Promise<void> => {
-    const sTab = "SchoolOwner";
-    let getUser = await FirstOrDefault(sTab, "Id", req.user.UserId);
-    if (getUser == null) {
-      await FirstOrDefault("Staff", "Id", req.user.UserId);
-    }
-    if (
-      getUser == null ||
-      !ROLE_ARRAY.slice(start, end).includes(getUser.Role)
-    ) {
-      res.status(403).json("Role not allowed");
-      return;
-    }
-    next();
-  };
-};
+// export const authrole = (start = 0, end = 2) => {
+//   return async (
+//     req: CustomRequest<IUser>, // Use the custom Request type
+//     res: Response<any, Record<string, any>>,
+//     next: NextFunction
+//   ): Promise<void> => {
+//     const sTab = "SchoolOwner";
+//     let getUser = await FirstOrDefault(sTab, "Id", req.user.UserId);
+//     if (getUser == null) {
+//       await FirstOrDefault("Staff", "Id", req.user.UserId);
+//     }
+//     if (
+//       getUser == null ||
+//       !ROLE_ARRAY.slice(start, end).includes(getUser.Role)
+//     ) {
+//       res.status(403).json("Role not allowed");
+//       return;
+//     }
+//     next();
+//   };
+// };
