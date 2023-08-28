@@ -72,10 +72,11 @@ POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
 
 ###
 
-PUT {{url}}/Student/UpdatePassword
+PUT {{url}}/Student/ResetPassword
 Content-Type: application/json
 
 {
+  "Email": "nifemiojinni22@gmail.com",
   "OTP": "815730",
   "NewPassword": "@$Nifemi567"
 }

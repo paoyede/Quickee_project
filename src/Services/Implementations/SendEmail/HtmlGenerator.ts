@@ -5,7 +5,7 @@ export const studentRegContent = (
       style="
         margin: 0 auto;
         padding: 20px;
-        background-color: #55caca;
+        background-color: #C45628;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         text-align: left;
       "
@@ -76,7 +76,7 @@ export const kitchenRegContent = (
       style="
         margin: 0 auto;
         padding: 20px;
-         background-color: #55caca;
+         background-color: #C45628;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         text-align: left;
       "
@@ -142,7 +142,7 @@ export const forgotPassContent = (
       style="
         margin: 0 auto;
         padding: 20px;
-        background-color: #55caca;
+        background-color: #C45628;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         text-align: left;
       "

@@ -14,7 +14,7 @@ export interface ISignUp {
   ExpiresAt?: Date;
 }
 
-export interface IUpdatePassword {
+export interface IResetPassword {
   Email: string;
   OTP: string;
   NewPassword: string;
@@ -37,7 +37,7 @@ export interface IAllUsersOrders {
 export interface IOrder {
   OrderId?: string;
   KitchenId: string;
-  UserId: string;
+  UserId?: string;
   Description?: string;
   Items: Item[];
 }

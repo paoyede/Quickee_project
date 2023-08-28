@@ -15,13 +15,13 @@ export const schoolTable =
 export const refreshTokenTable = `CREATE TABLE "RefreshToken" ("RefreshToken" TEXT)`;
 
 export const studentTable =
-  `CREATE TABLE "Student" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "FirstName" TEXT, "LastName" TEXT, "Email" TEXT,` +
-  `"Password" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false, "University" TEXT, "UserName" TEXT, "VerificationCode" VARCHAR(6),` +
+  `CREATE TABLE "Student" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "FirstName" TEXT NOT NULL, "LastName" TEXT NOT NULL, "Email" TEXT NOT NULL,` +
+  `"Password" VARCHAR NOT NULL, "IsVerifiedEmail" BOOLEAN DEFAULT false, "University" TEXT NOT NULL, "UserName" TEXT, "VerificationCode" VARCHAR(6),` +
   `"ExpiresAt" TIMESTAMP, "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const kitchenTable =
   `CREATE TABLE "Kitchen" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "Name" TEXT, "KitchenEmail" TEXT, "KitchenPassword" VARCHAR,` +
-  `"Manager" TEXT, "ManagerPhone" BIGINT, "AdminEmail" VARCHAR, "AdminPassword" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
+  `"Manager" TEXT, "ManagerPhone" BIGINT, "AdminName" TEXT, "AdminPhone" BIGINT, "AdminEmail" VARCHAR, "AdminPassword" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
   `"University" TEXT, "AccountNumber" BIGINT, "AccountName" TEXT, "BankName" TEXT, "VerificationCode" VARCHAR(6), "ExpiresAt" TIMESTAMP,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
@@ -35,14 +35,24 @@ export const ReviewTable =
   `"AgreeCount" BIGINT, "DisagreeCount" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
-export const OrdersTable =
-  `CREATE TABLE "Orders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID PRIMARY KEY, "Name" TEXT,` +
+export const AllQuickOrders =
+  `CREATE TABLE "AllQuickOrders" ("OrderId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "UserId" UUID,` +
+  `"OrderName" TEXT, "Description" TEXT, "TotalAmount" BIGINT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const QuickOrders =
+  `CREATE TABLE "QuickOrders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID PRIMARY KEY, "Name" TEXT,` +
   `"Scoops" BIGINT, "Price" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const PaymentsTable =
   `CREATE TABLE "Payments" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "UserId" UUID, "OrderId" TEXT,` +
   `"TrxRef" VARCHAR, "IsSuccess" BOOLEAN DEFAULT false,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const OrdersTable =
+  `CREATE TABLE "Orders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID PRIMARY KEY, "Name" TEXT,` +
+  `"Scoops" BIGINT, "Price" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const AllOrders =

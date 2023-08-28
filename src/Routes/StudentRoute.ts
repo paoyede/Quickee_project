@@ -1,10 +1,14 @@
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import {
+  deleteQuickOrders,
   forgotPassword,
+  resendVerifyEmail,
   resetPassword,
   saveOrders,
+  saveQuickOrders,
   signin,
   signup,
+  updateQuickOrders,
   verifyEmail,
 } from "../Controller/StudentController";
 import { Request, Response, Router } from "express";
@@ -21,11 +25,17 @@ const studentRoute = (producer: Producer) => {
   // router.post("/SignUp", signup);
   router.post("/SignIn", signin);
   router.put("/VerifyEmail", verifyEmail);
+  router.get("/ResendVerifyEmail", (req: Request, res: Response) =>
+    resendVerifyEmail(producer, req, res)
+  );
   router.post("/ForgotPassword", (req: Request, res: Response) =>
     forgotPassword(producer, req, res)
   );
   router.put("/ResetPassword", resetPassword);
   router.post("/SaveOrders", authtoken, saveOrders);
+  router.post("/SaveQuickOrders", authtoken, saveQuickOrders);
+  router.put("/UpdateQuickOrders", updateQuickOrders);
+  router.delete("/DeleteQuickOrders", deleteQuickOrders);
 
   return router;
 };

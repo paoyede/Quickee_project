@@ -15,7 +15,7 @@ import {
 import {
   FetchedSuccess,
   InternalError,
-  SchoolNotFound,
+  NotFoundResponse,
 } from "../Response/Responses";
 import { Message } from "../Response/IResponse";
 
@@ -57,7 +57,7 @@ export const getSchool = async (req: Request, res: Response) => {
     const isSchoolExist = await FirstOrDefault(schTab, dbId, id);
 
     if (isSchoolExist == null) {
-      const error = Message(400, SchoolNotFound);
+      const error = Message(400, NotFoundResponse("School"));
       res.status(400).json(error);
     } else {
       const response = Message(200, FetchedSuccess, isSchoolExist);

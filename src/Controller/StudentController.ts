@@ -1,21 +1,23 @@
 import { IEmailRequest } from "./../Models/IEmail";
 import {
   IAllUsersOrders,
-  IUpdatePassword,
+  IResetPassword,
   IVerifyEmail,
 } from "./../Models/IStudent";
 import {
   LoginSuccess,
   WrongPassword,
-  UserNotFound,
   CreateSuccess,
   InternalError,
-  UserIsExist,
   ResetLinkSent,
   WrongOtp,
   UpdateSuccess,
   UnverifiedEmail,
   ExpiredOTP,
+  VerifyEmail,
+  DeletedResponse,
+  NotFoundResponse,
+  AlreadyExistResponse,
 } from "../Response/Responses";
 import { IOrder, ISignIn } from "../Models/IStudent";
 import { Request, Response } from "express";
@@ -24,6 +26,7 @@ import {
   AddToDB,
   FirstOrDefault,
   GetAll,
+  Remove,
   Update,
 } from "../Infrastructure/Repository";
 import { Message } from "../Response/IResponse";
@@ -38,6 +41,19 @@ import {
   cryptoGenTrxRef,
 } from "../Utilities/RandomNumber";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
+import {
+  IAllQuickOrdersDto,
+  IOrderDto,
+  IQuickOrderDto,
+  ISignInDto,
+  ISignUpDto,
+  IUpdateQuickOrderDto,
+  orderKeys,
+  qorderKeys,
+  studSigninKeys,
+  studSignupKeys,
+  updateQOrderKeys,
+} from "../Models/DTOs/IStudentDto";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -45,7 +61,11 @@ const dbid2 = "UserName";
 const rtokTab = "RefreshToken";
 const ordTab = "Orders";
 const aOrdTab = "AllUsersOrders";
+const qordTab = "QuickOrders";
+const aqOrdTab = "AllQuickOrders";
 const forgot = "ForgotPassword";
+const kTab = "Kitchen";
+const odbId = "OrderId";
 
 // const producer = new Producer();
 
@@ -55,12 +75,28 @@ export const signup = async (
   res: Response
 ): Promise<any> => {
   try {
-    const payload: ISignUp = req.body;
+    const checkPayload: ISignUpDto = req.body;
+
+    if (!isValidPayload(checkPayload, studSignupKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const payload: ISignUp = {
+      ...checkPayload,
+    };
     const userId = payload.Email;
     // console.log(userId);
     var isUserExist = await FirstOrDefault(stdTab, dbId, userId);
     if (isUserExist != null) {
-      const error = Message(400, UserIsExist);
+      const error = Message(400, AlreadyExistResponse("User"));
       return res.status(400).json(error);
     }
 
@@ -105,12 +141,25 @@ export const signup = async (
 
 export const signin = async (req: Request, res: Response) => {
   try {
-    const payload: ISignIn = req.body;
+    const checkPayload: ISignInDto = req.body;
+
+    if (!isValidPayload(checkPayload, studSigninKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+    const payload: ISignIn = { ...checkPayload };
     const userId = payload.UserName;
     var isUserExist = await FirstOrDefault(stdTab, dbid2, userId);
 
     if (isUserExist === null) {
-      const error = Message(400, UserNotFound);
+      const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
@@ -158,7 +207,7 @@ export const forgotPassword = async (
     const email = req.query.email.toString();
     var isUserExist = await FirstOrDefault(stdTab, dbId, email);
     if (isUserExist === null) {
-      const error = Message(400, UserNotFound);
+      const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
@@ -207,7 +256,14 @@ export const forgotPassword = async (
 
 export const resetPassword = async (req: Request, res: Response) => {
   try {
-    const payload: IUpdatePassword = req.body;
+    const payload: IResetPassword = req.body;
+    const emptyFields = Validation(payload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
     var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
     if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
       const error = Message(400, WrongOtp);
@@ -235,9 +291,16 @@ export const resetPassword = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const payload: IVerifyEmail = req.body;
+    const emptyFields = Validation(payload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
     var isUserExist = await FirstOrDefault(stdTab, dbId, payload.Email);
     if (isUserExist === null) {
-      const error = Message(400, UserNotFound);
+      const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
@@ -262,24 +325,84 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
-export const saveOrders = async (
+export const resendVerifyEmail = async (
+  producer: Producer,
   req: Request,
   res: Response
-): Promise<void> => {
+): Promise<any> => {
+  try {
+    const email = req.query.email.toString();
+    console.log("Email: ", email);
+    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const vcode = "VerificationCode";
+    const genCode = await CryptoGenSixDigitNum(6, stdTab, vcode);
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+
+    const payload = { ExpiresAt: currentTime, VerificationCode: genCode };
+    await Update(stdTab, dbId, email, payload);
+
+    const rabbitmqPayload: IEmailRequest = {
+      EmailTemplate: "studentreg",
+      Type: "Email verification",
+      Name: isUserExist.LastName,
+      Payload: new Map([["Code", genCode]]),
+      Reciever: email,
+    };
+
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    rabbitmqPayload.Payload = payloadArray;
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString);
+    const success = Message(200, VerifyEmail);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const saveOrders = async (req: Request, res: Response): Promise<any> => {
   try {
     const email = req.query.Email.toString();
-    const payload: IOrder = req.body;
+    const checkPayload: IOrderDto = req.body;
+    const payload: IOrder = { ...checkPayload };
+
+    if (!isValidPayload(checkPayload, orderKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const kitId = payload.KitchenId;
+    // console.log(userId);
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kitId);
+    if (isKitchenExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
 
     var isUserExist = await FirstOrDefault(stdTab, dbId, email);
     if (isUserExist === null) {
-      const error = Message(400, UserNotFound);
-      res.status(400).json(error);
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
     }
 
     const totalSum = payload.Items.reduce((sum, item) => sum + item.Price, 0);
     const allOrderData: IAllUsersOrders = {
       KitchenId: payload.KitchenId,
-      UserId: payload.UserId,
+      UserId: isUserExist.Id,
       Description: payload.Description,
       TotalAmount: totalSum,
       TrxRef: await cryptoGenTrxRef(7, aOrdTab, "TrxRef"),
@@ -294,9 +417,195 @@ export const saveOrders = async (
 
     const newResponse = { OrderId: saveToAllorders.OrderId };
     const success = Message(200, CreateSuccess, newResponse);
-    res.status(200).json(success);
+    return res.status(200).json(success);
   } catch (error) {
     const err = Message(500, InternalError);
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
+};
+
+export const saveQuickOrders = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const email = req.query.Email.toString();
+    const checkPayload: IQuickOrderDto = req.body;
+    const payload: IQuickOrderDto = { ...checkPayload };
+
+    if (!isValidPayload(checkPayload, qorderKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const kitId = payload.KitchenId;
+    // console.log(userId);
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kitId);
+    if (isKitchenExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const totalSum = payload.Items.reduce((sum, item) => sum + item.Price, 0);
+    const allOrderData: IAllQuickOrdersDto = {
+      KitchenId: payload.KitchenId,
+      UserId: isUserExist.Id,
+      Description: payload.Description,
+      TotalAmount: totalSum,
+      OrderName: payload.OrderName,
+    };
+
+    const saveToAllorders = await AddToDB(aqOrdTab, allOrderData);
+    for (let index = 0; index < payload.Items.length; index++) {
+      const eachOrder = payload.Items[index];
+      eachOrder.OrderId = saveToAllorders.OrderId;
+      await AddToDB(qordTab, eachOrder);
+    }
+
+    const newResponse = { OrderId: saveToAllorders.OrderId };
+    const success = Message(200, CreateSuccess, newResponse);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const updateQuickOrders = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const email = req.query.Email.toString();
+    const checkPayload: IUpdateQuickOrderDto = req.body;
+    const payload: IUpdateQuickOrderDto = { ...checkPayload };
+
+    if (!isValidPayload(checkPayload, updateQOrderKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const kitId = payload.KitchenId;
+    // console.log(userId);
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kitId);
+    if (isKitchenExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const ordId = payload.OrderId;
+    var isQuickOrderExist = await FirstOrDefault(aqOrdTab, odbId, ordId);
+    if (isQuickOrderExist === null) {
+      const error = Message(400, NotFoundResponse("QuickOrder"));
+      return res.status(400).json(error);
+    }
+
+    const totalSum = payload.Items.reduce((sum, item) => sum + item.Price, 0);
+    const allOrderData: IAllQuickOrdersDto = {
+      KitchenId: payload.KitchenId,
+      UserId: isUserExist.Id,
+      Description: payload.Description,
+      TotalAmount: totalSum,
+      OrderName: payload.OrderName,
+    };
+
+    const saveToAllorders = await Update(aqOrdTab, odbId, ordId, allOrderData);
+    for (let index = 0; index < payload.Items.length; index++) {
+      const eachOrder = payload.Items[index];
+      eachOrder.OrderId = saveToAllorders.OrderId;
+      await Update(qordTab, odbId, ordId, eachOrder);
+    }
+
+    const success = Message(200, UpdateSuccess);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const deleteQuickOrders = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const qoId = req.query.QoId.toString();
+
+    var isQOrderExist = await FirstOrDefault(aqOrdTab, "OrderId", qoId);
+    if (isQOrderExist === null) {
+      const error = Message(400, NotFoundResponse("QuickOrder"));
+      return res.status(400).json(error);
+    }
+
+    await Remove(aqOrdTab, "OrderId", qoId);
+    await Remove(qordTab, "OrderId", qoId);
+
+    const newResponse = DeletedResponse("QuickOrder", qoId);
+    const success = Message(200, newResponse);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const Validation = <T extends Record<string, any>>(
+  payload: T
+): string[] => {
+  const emptyOrNullFields: string[] = [];
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (
+      payload.hasOwnProperty(key) &&
+      typeof key != undefined &&
+      (value === null || value === "")
+    ) {
+      emptyOrNullFields.push(key);
+    }
+  });
+
+  return emptyOrNullFields;
+};
+
+export const isValidPayload = <T extends Record<string, any>>(
+  data: any,
+  dto: string[]
+): data is T => {
+  const interfaceKeys = dto;
+  const payloadKeys = Object.keys(data);
+  // console.log({ ...payloadKeys });
+  // console.log({ ...interfaceKeys });
+
+  if (interfaceKeys.length !== payloadKeys.length) {
+    console.log("first: ", interfaceKeys.length, ", ", payloadKeys.length);
+    return false;
+  }
+
+  return payloadKeys.every((key) => interfaceKeys.includes(key));
 };

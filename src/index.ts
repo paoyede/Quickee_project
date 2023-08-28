@@ -41,7 +41,6 @@ if (cluster.isPrimary) {
   });
 } else {
   const app = express();
-
   const rabbitMQConfig = new RabbitMQConfig();
 
   rabbitMQConfig
