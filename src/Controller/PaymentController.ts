@@ -11,11 +11,8 @@ import { FirstOrDefault } from "../Infrastructure/Repository";
 export const makepaystack_payment = async (req: Request, res: Response) => {
   try {
     const payload: IPayment = req.body;
-    var getReference = await FirstOrDefault(
-      "AllUsersOrders",
-      "Id",
-      payload.orderId
-    );
+    const dbpar = "AllUsersOrders";
+    var getReference = await FirstOrDefault(dbpar, "OrderId", payload.orderId);
     if (getReference == null) {
       const error = Message(400, "Order not found");
       res.status(400).json(error);
