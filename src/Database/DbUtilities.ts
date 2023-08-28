@@ -41,7 +41,7 @@ export const AllQuickOrders =
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const QuickOrders =
-  `CREATE TABLE "QuickOrders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID PRIMARY KEY, "Name" TEXT,` +
+  `CREATE TABLE "QuickOrders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID, "Name" TEXT,` +
   `"Scoops" BIGINT, "Price" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
@@ -51,7 +51,7 @@ export const PaymentsTable =
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const OrdersTable =
-  `CREATE TABLE "Orders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID PRIMARY KEY, "Name" TEXT,` +
+  `CREATE TABLE "Orders" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "OrderId" UUID, "Name" TEXT,` +
   `"Scoops" BIGINT, "Price" BIGINT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
