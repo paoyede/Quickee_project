@@ -454,7 +454,10 @@ export const getKitchenMenusById = async (req: Request, res: Response) => {
   }
 };
 
-const compareAndUpdateProperties = (incomingData: any, existingData: any) => {
+export const compareAndUpdateProperties = (
+  incomingData: any,
+  existingData: any
+) => {
   const properties = Object.keys(incomingData);
   const propertiesDB = Object.keys(existingData);
 

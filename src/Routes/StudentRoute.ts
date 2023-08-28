@@ -1,5 +1,6 @@
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import {
+  GetQuickOrdersByUserId,
   deleteQuickOrders,
   forgotPassword,
   resendVerifyEmail,
@@ -35,6 +36,7 @@ const studentRoute = (producer: Producer) => {
   router.post("/SaveOrders", authtoken, saveOrders);
   router.post("/SaveQuickOrders", authtoken, saveQuickOrders);
   router.put("/UpdateQuickOrders", updateQuickOrders);
+  router.get("/GetQuickOrdersByUserEmail", GetQuickOrdersByUserId);
   router.delete("/DeleteQuickOrders", deleteQuickOrders);
 
   return router;

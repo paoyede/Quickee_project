@@ -61,7 +61,7 @@ export interface IUpdateQuickOrderDto {
   OrderId: string;
   OrderName: string;
   Description: string;
-  Items: ItemDto[];
+  Items: UpdateItemDto[];
 }
 
 export interface IAllQuickOrdersDto {
@@ -82,9 +82,19 @@ export const updateQOrderKeys = [
   "OrderId",
 ];
 
-interface ItemDto {
+export interface ItemDto {
   OrderId?: string;
   Name: string;
   Price: number;
   Scoops: number;
+}
+
+export interface UpdateItemDto {
+  Id: string;
+  OrderId: string;
+  Name: string;
+  Scoops: number;
+  Price: number;
+  CreatedAt: string;
+  UpdatedAt: string;
 }

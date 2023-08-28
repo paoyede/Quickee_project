@@ -18,6 +18,7 @@ import {
   DeletedResponse,
   NotFoundResponse,
   AlreadyExistResponse,
+  FetchedSuccess,
 } from "../Response/Responses";
 import { IOrder, ISignIn } from "../Models/IStudent";
 import { Request, Response } from "express";
@@ -26,6 +27,7 @@ import {
   AddToDB,
   FirstOrDefault,
   GetAll,
+  GetAllById,
   Remove,
   Update,
 } from "../Infrastructure/Repository";
@@ -48,12 +50,15 @@ import {
   ISignInDto,
   ISignUpDto,
   IUpdateQuickOrderDto,
+  ItemDto,
+  UpdateItemDto,
   orderKeys,
   qorderKeys,
   studSigninKeys,
   studSignupKeys,
   updateQOrderKeys,
 } from "../Models/DTOs/IStudentDto";
+import { compareAndUpdateProperties } from "./KitchenController";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -66,6 +71,7 @@ const aqOrdTab = "AllQuickOrders";
 const forgot = "ForgotPassword";
 const kTab = "Kitchen";
 const odbId = "OrderId";
+const uid = "UserId";
 
 // const producer = new Producer();
 
@@ -484,6 +490,40 @@ export const saveQuickOrders = async (
   }
 };
 
+export const GetQuickOrdersByUserId = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const email = req.query.Email.toString();
+
+    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+    const udbId = isUserExist.Id;
+    const aQords = await GetAllById(aqOrdTab, uid, udbId);
+    let newAQorders: IUpdateQuickOrderDto[] = [];
+    for (let index = 0; index < aQords.length; index++) {
+      let eOrders = aQords[index];
+      const oid = eOrders.OrderId;
+      delete eOrders.CreatedAt;
+      delete eOrders.UpdatedAt;
+      const aqOrders = await GetAllById(qordTab, odbId, oid);
+      const nobj: IUpdateQuickOrderDto = { ...eOrders };
+      nobj.Items = aqOrders;
+      newAQorders.push(nobj);
+    }
+
+    const success = Message(200, FetchedSuccess, newAQorders);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
 export const updateQuickOrders = async (
   req: Request,
   res: Response
@@ -536,10 +576,16 @@ export const updateQuickOrders = async (
     };
 
     const saveToAllorders = await Update(aqOrdTab, odbId, ordId, allOrderData);
-    for (let index = 0; index < payload.Items.length; index++) {
-      const eachOrder = payload.Items[index];
+    const inItems = payload.Items;
+    const getAllQorders = await GetAllById(qordTab, odbId, ordId);
+    const allItems: UpdateItemDto[] = getAllQorders;
+    compareAndUpdateProperties(inItems, allItems);
+    console.log(allItems);
+    for (let index = 0; index < allItems.length; index++) {
+      const eachOrder = allItems[index];
       eachOrder.OrderId = saveToAllorders.OrderId;
-      await Update(qordTab, odbId, ordId, eachOrder);
+      const id = eachOrder.Id;
+      await Update(qordTab, "Id", id, eachOrder);
     }
 
     const success = Message(200, UpdateSuccess);
@@ -609,3 +655,12 @@ export const isValidPayload = <T extends Record<string, any>>(
 
   return payloadKeys.every((key) => interfaceKeys.includes(key));
 };
+
+function findObjectById(Id: string, list: UpdateItemDto[]) {
+  for (const obj of list) {
+    if (obj.Id === Id) {
+      return obj;
+    }
+  }
+  return null; // Return null if no match is found
+}
