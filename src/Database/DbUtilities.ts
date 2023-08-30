@@ -17,17 +17,23 @@ export const refreshTokenTable = `CREATE TABLE "RefreshToken" ("RefreshToken" TE
 export const studentTable =
   `CREATE TABLE "Student" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "FirstName" TEXT NOT NULL, "LastName" TEXT NOT NULL, "Email" TEXT NOT NULL,` +
   `"Password" VARCHAR NOT NULL, "IsVerifiedEmail" BOOLEAN DEFAULT false, "University" TEXT NOT NULL, "UserName" TEXT, "VerificationCode" VARCHAR(6),` +
-  `"ExpiresAt" TIMESTAMP, "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+  `"Role" TEXT, "ExpiresAt" TIMESTAMP, "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const kitchenTable =
-  `CREATE TABLE "Kitchen" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "Name" TEXT, "KitchenEmail" TEXT, "KitchenPassword" VARCHAR,` +
-  `"Manager" TEXT, "ManagerPhone" BIGINT, "AdminName" TEXT, "AdminPhone" BIGINT, "AdminEmail" VARCHAR, "AdminPassword" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
+  `CREATE TABLE "Kitchen" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenName" TEXT, "KitchenEmail" TEXT,` +
+  `"ManagerFirstName" TEXT, "ManagerLastName" TEXT, "ManagerPhone" BIGINT, "ManagerEmail" VARCHAR, "Password" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
   `"University" TEXT, "AccountNumber" BIGINT, "AccountName" TEXT, "BankName" TEXT, "VerificationCode" VARCHAR(6), "ExpiresAt" TIMESTAMP,` +
-  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+  `"Role" TEXT,"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const kitchenStaffTable =
+  `CREATE TABLE "KitchenStaff" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "FirstName" TEXT, "LastName" TEXT, "Email" VARCHAR,` +
+  `"Password" VARCHAR, "Phone" BIGINT, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
+  `"University" TEXT, "VerificationCode" VARCHAR(6), "ExpiresAt" TIMESTAMP,` +
+  `"Role" TEXT,"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const MenuTable =
   `CREATE TABLE "KitchenMenu" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "FoodName" TEXT, "Category" TEXT,` +
-  `"Class" TEXT, "Price" BIGINT, "Status" TEXT,` +
+  `"Class" TEXT, "Price" BIGINT, "TotalQuantity" BIGINT, "Status" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const ReviewTable =

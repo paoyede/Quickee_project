@@ -1,17 +1,33 @@
 export interface IKitchenCreate {
-  Name: string;
+  KitchenName: string;
   KitchenEmail: string;
-  KitchenPassword: string;
-  Manager: string;
+  ManagerFirstName: string;
+  ManagerLastName: string;
   ManagerPhone: number;
-  AdminEmail: string;
-  AdminPassword: string;
+  ManagerEmail: string;
+  Password: string;
+  IsVerifiedEmail: boolean;
   University: string;
   AccountNumber: number;
   AccountName: string;
   BankName: string;
+  VerificationCode: string;
+  ExpiresAt: Date;
+  Role: string;
+}
+
+export interface IAddKitchenStaff {
+  KitchenId: string;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  Password: string;
+  Phone: number;
+  IsVerifiedEmail?: boolean;
+  University: string;
   VerificationCode?: string;
   ExpiresAt?: Date;
+  Role?: string;
 }
 
 export interface IKitchenUpdate {
@@ -21,10 +37,18 @@ export interface IKitchenUpdate {
   University?: string;
 }
 
+export interface IKitchenUpdateStaff {
+  Email: string;
+  FirstName: string;
+  LastName: string;
+  Password: string;
+  Phone: number;
+  University: string;
+}
+
 export interface IKitchenLogin {
   Email: string;
   Password: string;
-  IsAdmin: boolean;
 }
 
 export interface CreateFoodMenu {

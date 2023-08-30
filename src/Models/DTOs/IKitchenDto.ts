@@ -1,33 +1,52 @@
 export interface IKitchenCreateDto {
-  Name: string;
+  KitchenName: string;
   KitchenEmail: string;
-  KitchenPassword: string;
-  Manager: string;
+  ManagerFirstName: string;
+  ManagerLastName: string;
   ManagerPhone: number;
-  AdminName: string;
-  AdminPhone: number;
-  AdminEmail: string;
-  AdminPassword: string;
+  ManagerEmail: string;
+  Password: string;
+  IsVerifiedEmail: boolean;
   University: string;
   AccountNumber: number;
   AccountName: string;
   BankName: string;
+  VerificationCode: string;
+  ExpiresAt: Date;
+  Role: string;
 }
 
 export const createkitchenKeys: string[] = [
-  "Name",
+  "KitchenName",
   "KitchenEmail",
-  "KitchenPassword",
-  "Manager",
+  "ManagerFirstName",
+  "ManagerLastName",
   "ManagerPhone",
-  "AdminName",
-  "AdminPhone",
-  "AdminEmail",
-  "AdminPassword",
+  "ManagerEmail",
+  "Password",
   "University",
   "AccountNumber",
   "AccountName",
   "BankName",
+];
+
+export const addKitStaffKeys: string[] = [
+  "KitchenId",
+  "FirstName",
+  "LastName",
+  "Email",
+  "Password",
+  "Phone",
+  "University",
+  "Role",
+];
+
+export const updateKitStaffKeys: string[] = [
+  "FirstName",
+  "LastName",
+  "Password",
+  "Phone",
+  "University",
 ];
 
 export interface IKitchenUpdateDto {
@@ -58,6 +77,7 @@ export const foodmenukeys = [
   "Category",
   "Class",
   "Price",
+  "TotalQuantity",
   "Status",
 ];
 
@@ -67,4 +87,31 @@ export interface UpdateFoodMenuDto {
   Class?: string;
   Price?: number;
   Status?: string;
+}
+
+export interface IGetKitchenOrdersDto {
+  KitchenId: string;
+  Orders: IGetOrdersDto[];
+}
+
+export interface IGetOrdersDto {
+  OrderId: string;
+  UserId: string;
+  TrxRef: string;
+  IsPaid: boolean;
+  Description: string;
+  TotalAmount: number;
+  CreatedAt: string;
+  UpdatedAt: string;
+  Items: IGetItemsDto[];
+}
+
+export interface IGetItemsDto {
+  Id: string;
+  OrderId: string;
+  Name: string;
+  Price: number;
+  Scoops: number;
+  CreatedAt: string;
+  UpdatedAt: string;
 }

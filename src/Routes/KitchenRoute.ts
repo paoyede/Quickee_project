@@ -1,15 +1,20 @@
 import { authtoken } from "./../Middleware/TokenAuth";
 import {
+  addKitchenStaff,
   createFoodMenu,
   createKitchen,
   deleteFoodMenu,
   deleteKitchen,
+  deleteKitchenStaff,
   forgotPassword,
   getKitchenMenusById,
+  getKitchenOrdersByEmail,
+  resendVerifyEmail,
   resetPassword,
   signin,
   updateFoodMenu,
   updateKitchen,
+  updateKitchenStaff,
   verifyEmail,
 } from "../Controller/KitchenController";
 import { Request, Response, Router } from "express";
@@ -24,7 +29,15 @@ const kitchenRoute = (producer: Producer) => {
     createKitchen(producer, req, res)
   );
   router.post("/SignIn", signin);
+  router.post("/AddStaff", (req: Request, res: Response) =>
+    addKitchenStaff(producer, req, res)
+  );
+  router.delete("/DeleteStaff", deleteKitchenStaff);
+  router.put("/UpdateStaff", updateKitchenStaff);
   router.put("/VerifyEmail", verifyEmail);
+  router.get("/ResendVerifyEmail", (req: Request, res: Response) =>
+    resendVerifyEmail(producer, req, res)
+  );
   router.post("/ForgotPassword", (req: Request, res: Response) =>
     forgotPassword(producer, req, res)
   );
@@ -35,6 +48,7 @@ const kitchenRoute = (producer: Producer) => {
   router.put("/UpdateMenu", authtoken, updateFoodMenu);
   router.delete("/DeleteMenu", authtoken, deleteFoodMenu);
   router.get("/GetKitchenMenus", authtoken, getKitchenMenusById);
+  router.get("/GetKitchenOrders", authtoken, getKitchenOrdersByEmail);
 
   return router;
 };

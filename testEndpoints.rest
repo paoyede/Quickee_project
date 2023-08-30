@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6Im5pZmVtaW9qaW5uaTIyQGdtYWlsLmNvbSIsIlVzZXJJZCI6IjA0ODRlMzljLWU4NDAtNDA5Zi1iMTEzLTYxODZhYTg2ZWExNiIsImlhdCI6MTY5Mjc4NTg0OSwiZXhwIjoxNjkyNzg5NDQ5fQ.D1eLoadl4pAMR92rMDRIcOgMxcihojy2QeCj1IrlONM
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNDA0NjExLCJleHAiOjE2OTM0MDgyMTF9.W6sIJcDeEG2_TtBM0MEHhtaJsh3bZ_Nfsb0QLFgAq7U
 ###@atk1 = {{atk}}
 # @url = http://54.211.76.116
 # @url = http://192.168.186.240
@@ -47,8 +47,8 @@ POST {{url}}/Student/SignIn
 Content-Type: application/json
 
 {
-    "UserName": "Nifemi.Ojinni",
-    "Password": "@$Nifemi567"
+    "UserName": "Raphael.Olaiyapo",
+    "Password": "Aduragbemi1&&&"
 }
 
 ###
@@ -85,33 +85,32 @@ Content-Type: application/json
 
 ###
 
-POST {{url}}/Student/SaveOrders?Email=nifemiojinni22@gmail.com
+POST {{url}}/Student/SaveOrders?Email=raphael.tunji@yahoo.com
 Authorization: BEARER {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "8fea4167-d8fc-4355-ac0c-126512eec58a",
-  "UserId": "48a4d227-e28a-4dab-9f35-1f25a6778bf1",
+  "KitchenId": "c7384019-4e4d-4e44-900d-9eaddc1ad97e",
   "Description": "Mix egusi and okro soup together",
   "Items": [
     {
-      "Name": "Amala",
-      "Price": 800,
+      "Name": "Jollof rice",
+      "Price": 900,
       "Scoops": 2
     },
     {
-      "Name": "Egusi soup",
+      "Name": "Fried rice",
       "Price": 600,
       "Scoops": 2
     },
     {
-      "Name": "Chicken",
-      "Price": 1200,
+      "Name": "Beef",
+      "Price": 700,
       "Scoops": 1
     },
     {
-      "Name": "Okro soup",
-      "Price": 300,
+      "Name": "Coke",
+      "Price": 500,
       "Scoops": 1
     }
   ]
@@ -156,13 +155,13 @@ POST {{url}}/Kitchen/Create
 Content-Type: application/json
 
 {
-  "Name": "RaphaelFood",
+  "KitchenName": "RaphaelFood",
   "KitchenEmail": "support@raphaelfood.com",
-  "KitchenPassword": "Alade1&&&",
-  "Manager": "George Phillip",
+  "ManagerFirstName": "George",
+  "ManagerLastName": "George",
   "ManagerPhone": 23481035635487,
-  "AdminEmail": "Christi@gmail.com",
-  "AdminPassword": "Christi@567",
+  "ManagerEmail": "raphael.tunji@yahoo.com",
+  "Password": "Christi@567",
   "University": "Elizade University, Ondo",
   "AccountNumber": 1234567890,
   "AccountName": "Raphael Food LTD",
@@ -177,9 +176,8 @@ POST {{url}}/Kitchen/SignIn
 Content-Type: application/json
 
 {
-  "Email": "support@raphaelfood.com",
-  "Password": "Alade1&&&",
-  "IsAdmin": false
+  "Email": "raphael.tunji@yahoo.com",
+  "Password": "Alade1&&&"
 }
 
 ###
@@ -202,14 +200,16 @@ DELETE {{url}}/Kitchen/Delete?email=support@raphaelfood.com
 ###
 
 POST {{url}}/Kitchen/CreateMenu
+Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "3fb940c6-1047-4085-9aad-9ffc2593d184",
+  "KitchenId": "c7384019-4e4d-4e44-900d-9eaddc1ad97e",
   "FoodName": "Ofada",
   "Category": "Food",
   "Class": "Rice",
   "Price": 1200,
+  "TotalQuantity": 200,
   "Status": "available"
 }
 
@@ -231,7 +231,8 @@ DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
 
 ###
 
-GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=8fea4167-d8fc-4355-ac0c-126512eec58a
+GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=c7384019-4e4d-4e44-900d-9eaddc1ad97e
+Authorization: Bearer {{atk}}
 
 ####
 
@@ -256,3 +257,22 @@ GET {{url}}/Payment/VerifyPayment?Reference=IjIcH04
 GET {{url}}/Kitchen/Fetch?food=rice
 
 ###
+
+DELETE {{url}}/Kitchen/DeleteStaff?email=raphael.tunji@yahoo.com
+
+###
+
+
+PUT {{url}}/Kitchen/UpdateStaff?email=raphael.tunji@yahoo.com
+Content-Type: application/json
+
+{
+  "FirstName": "Gorge",
+  "LastName": "Alade"
+}
+
+###
+
+
+GET {{url}}/Kitchen/GetKitchenOrders?Email=support@raphaelfood.com
+Authorization: Bearer {{atk}}

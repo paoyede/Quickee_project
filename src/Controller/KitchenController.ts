@@ -1,8 +1,15 @@
 import {
+  IGetKitchenOrdersDto,
+  IGetOrdersDto,
+  addKitStaffKeys,
+} from "./../Models/DTOs/IKitchenDto";
+import {
   CreateFoodMenu,
+  IAddKitchenStaff,
   IKitchenCreate,
   IKitchenLogin,
   IKitchenUpdate,
+  IKitchenUpdateStaff,
   UpdateFoodMenu,
 } from "./../Models/IKitchen";
 import {
@@ -17,6 +24,7 @@ import {
   WrongPassword,
   DeletedResponse,
   AlreadyExistResponse,
+  VerifyEmail,
 } from "../Response/Responses";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
@@ -50,11 +58,16 @@ import {
 } from "../Models/DTOs/IKitchenDto";
 
 const kTab = "Kitchen";
+const kstaffTab = "KitchenStaff";
 const kmTab = "KitchenMenu";
 const dbId = "KitchenEmail";
 const dbid2 = "AdminEmail";
+const dbEmail = "Email";
 const rtokTab = "RefreshToken";
 const forgot = "ForgotPassword";
+const ordTab = "Orders";
+const aOrdTab = "AllUsersOrders";
+const dbkId = "KitchenId";
 
 export const createKitchen = async (
   producer: Producer,
@@ -82,26 +95,26 @@ export const createKitchen = async (
     // console.log(userId);
     var isUserExist = await FirstOrDefault(kTab, dbId, userId);
     if (isUserExist != null) {
-      const error = Message(400, AlreadyExistResponse("User"));
+      const error = Message(400, AlreadyExistResponse("Kitchen"));
       return res.status(400).json(error);
     }
-    const hash = await bcrypt.hash(payload.KitchenPassword, 10);
-    payload.KitchenPassword = hash;
-    const hash2 = await bcrypt.hash(payload.AdminPassword, 10);
-    payload.AdminPassword = hash2;
+
+    const hash = await bcrypt.hash(payload.Password, 10);
+    payload.Password = hash;
     const vcode = "VerificationCode";
     const genCode = await CryptoGenSixDigitNum(6, kTab, vcode);
     payload.VerificationCode = genCode;
     const currentTime = new Date();
     currentTime.setMinutes(currentTime.getMinutes() + 5);
     payload.ExpiresAt = currentTime;
+    payload.Role = "superadmin";
 
     const rabbitmqPayload: IEmailRequest = {
       EmailTemplate: "kitchenreg",
       Type: "Email verification",
-      Name: payload.Name,
+      Name: payload.ManagerLastName,
       Payload: new Map([["Code", genCode]]),
-      Reciever: payload.KitchenEmail,
+      Reciever: payload.ManagerEmail,
     };
 
     // Convert the Map to an array of key-value pairs
@@ -122,27 +135,148 @@ export const createKitchen = async (
   }
 };
 
+export const addKitchenStaff = async (
+  producer: Producer,
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const checkPayload: IAddKitchenStaff = req.body;
+
+    if (!isValidPayload(checkPayload, addKitStaffKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const payload: IAddKitchenStaff = { ...checkPayload };
+
+    const userId = payload.Email;
+    const kId = payload.KitchenId;
+
+    var isUserExist = await FirstOrDefault(kTab, "Id", kId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+    // console.log(userId);
+    var isUserExist = await FirstOrDefault(kstaffTab, dbEmail, userId);
+    if (isUserExist != null) {
+      const error = Message(400, AlreadyExistResponse("Staff"));
+      return res.status(400).json(error);
+    }
+    const hash = await bcrypt.hash(payload.Password, 10);
+    payload.Password = hash;
+    const vcode = "VerificationCode";
+    const genCode = await CryptoGenSixDigitNum(6, kstaffTab, vcode);
+    payload.VerificationCode = genCode;
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+    payload.ExpiresAt = currentTime;
+
+    const rabbitmqPayload: IEmailRequest = {
+      EmailTemplate: "kitchenreg",
+      Type: "Email verification",
+      Name: payload.LastName,
+      Payload: new Map([["Code", genCode]]),
+      Reciever: payload.Email,
+    };
+
+    // Convert the Map to an array of key-value pairs
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    // Update the original object with the array
+    rabbitmqPayload.Payload = payloadArray;
+
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
+    const response = await AddToDB(kstaffTab, payload);
+    const success = Message(200, CreateSuccess, response);
+    return res.status(200).json(success);
+
+    // console.log(payload);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    res.status(500).json(err);
+  }
+};
+
+export const deleteKitchenStaff = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const email = req.query.email.toString();
+    const isKitchenExist = await FirstOrDefault(kstaffTab, dbEmail, email);
+
+    if (isKitchenExist == null) {
+      const error = Message(400, NotFoundResponse("Staff"));
+      res.status(400).json(error);
+    } else {
+      await Remove(kTab, dbId, email);
+      res.status(200).json(DeletedResponse("Staff", email));
+    }
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
+export const updateKitchenStaff = async (req: Request, res: Response) => {
+  try {
+    const email = req.query.email.toString();
+    const checkPayload: IKitchenUpdateStaff = req.body;
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const isKitchenExist = await FirstOrDefault(kstaffTab, dbEmail, email);
+    if (isKitchenExist == null) {
+      const error = Message(400, NotFoundResponse("Staff"));
+      return res.status(400).json(error);
+    }
+    delete checkPayload.Email;
+
+    compareAndUpdateProperties(checkPayload, isKitchenExist);
+    const update = await Update(kstaffTab, dbEmail, email, isKitchenExist);
+    const response = Message(200, UpdateSuccess, update);
+
+    return res.status(200).json(response);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
+
 export const signin = async (req: Request, res: Response) => {
   try {
     const payload: IKitchenLogin = req.body;
     const userId = payload.Email;
     // console.log(userId);
-    var dbid = payload.IsAdmin ? dbid2 : dbId;
-    var isUserExist = await FirstOrDefault(kTab, dbid, userId);
+    var checkKitchen = await FirstOrDefault(kTab, dbId, userId);
+    var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, userId);
 
-    if (isUserExist == null) {
-      const error = Message(400, NotFoundResponse("Kitchen"));
+    if (checkKitchen === null && checkstaff === null) {
+      const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
+    var isUserExist = checkKitchen != null ? checkKitchen : checkstaff;
     if (isUserExist.IsVerifiedEmail === false) {
       const error = Message(403, UnverifiedEmail);
       return res.status(403).json(error);
     }
 
-    var userPassword = payload.IsAdmin
-      ? isUserExist.AdminPassword
-      : isUserExist.KitchenPassword;
+    var userPassword = isUserExist.Password;
     const isMatched = await bcrypt.compare(payload.Password, userPassword);
     if (!isMatched) {
       const error = Message(400, WrongPassword);
@@ -195,6 +329,55 @@ export const verifyEmail = async (req: Request, res: Response) => {
   } catch (error) {
     const errMessage = Message(500, InternalError);
     res.status(500).json(errMessage);
+  }
+};
+
+export const resendVerifyEmail = async (
+  producer: Producer,
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const email = req.query.email.toString();
+    console.log("Email: ", email);
+    var checkKitchen = await FirstOrDefault(kTab, dbId, email);
+    var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, email);
+
+    if (checkKitchen === null && checkstaff === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = checkKitchen != null ? checkKitchen : checkstaff;
+    const dbTab = checkKitchen != null ? kTab : kstaffTab;
+    const dbParam = checkKitchen != null ? dbId : dbEmail;
+    const lastName =
+      checkKitchen != null ? isUserExist.ManagerLastName : isUserExist.LastName;
+    const vcode = "VerificationCode";
+    const genCode = await CryptoGenSixDigitNum(6, dbTab, vcode);
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+
+    const payload = { ExpiresAt: currentTime, VerificationCode: genCode };
+    await Update(dbTab, dbParam, email, payload);
+
+    const rabbitmqPayload: IEmailRequest = {
+      EmailTemplate: "kitchentreg",
+      Type: "Email verification",
+      Name: lastName,
+      Payload: new Map([["Code", genCode]]),
+      Reciever: email,
+    };
+
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    rabbitmqPayload.Payload = payloadArray;
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString);
+    const success = Message(200, VerifyEmail);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
   }
 };
 
@@ -290,7 +473,7 @@ export const resetPassword = async (req: Request, res: Response) => {
         : "";
 
     const newPassword =
-      dbParam === dbId ? { KitchenPassword: hash } : { AdminPassword: hash };
+      dbParam === dbId ? { Password: hash } : { AdminPassword: hash };
     if (dbParam != "") await Update(kTab, dbParam, userId, newPassword);
     const success = Message(200, UpdateSuccess);
     return res.status(200).json(success);
@@ -451,6 +634,49 @@ export const getKitchenMenusById = async (req: Request, res: Response) => {
   } catch (error) {
     const errMessage = Message(500, InternalError);
     res.status(500).json(errMessage);
+  }
+};
+
+export const getKitchenOrdersByEmail = async (req: Request, res: Response) => {
+  try {
+    const email = req.query.Email.toString();
+
+    var isUserExist = await FirstOrDefault(kTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+    const udbId = isUserExist.Id;
+    const aQords = await GetAllById(aOrdTab, dbkId, udbId);
+    let newAQorders: IGetKitchenOrdersDto = {
+      KitchenId: aQords.at(0).KitchenId,
+      Orders: [],
+    };
+
+    const odbId = "OrderId";
+    for (let index = 0; index < aQords.length; index++) {
+      let eOrders = aQords[index];
+      const oid = eOrders.OrderId;
+      delete eOrders.CreatedAt;
+      // delete eOrders.UpdatedAt;
+      delete eOrders.KitchenId;
+      let order: IGetOrdersDto = { ...eOrders };
+      const orders = await GetAllById(ordTab, odbId, oid);
+      order.Items = orders;
+      for (let i = 0; i < orders.length; i++) {
+        delete orders[i].CreatedAt;
+        delete orders[i].UpdatedAt;
+        delete orders[i].OrderId;
+        delete orders[i].Id;
+      }
+      newAQorders.Orders.push(order);
+    }
+
+    const success = Message(200, FetchedSuccess, newAQorders);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
   }
 };
 
