@@ -2,6 +2,7 @@ import {
   IGetKitchenOrdersDto,
   IGetOrdersDto,
   addKitStaffKeys,
+  noEditKitchenKeys,
 } from "./../Models/DTOs/IKitchenDto";
 import {
   CreateFoodMenu,
@@ -49,13 +50,18 @@ import {
 import { IEmailRequest } from "../Models/IEmail";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import { IResetPassword, IVerifyEmail } from "../Models/IStudent";
-import { Validation, isValidPayload } from "./StudentController";
 import {
   CreateFoodMenuDto,
   IKitchenCreateDto,
   createkitchenKeys,
   foodmenukeys,
 } from "../Models/DTOs/IKitchenDto";
+import {
+  PayloadCannotContain,
+  Validation,
+  compareAndUpdateProperties,
+  isValidPayload,
+} from "../Utilities/Validations";
 
 const kTab = "Kitchen";
 const kstaffTab = "KitchenStaff";
@@ -362,7 +368,7 @@ export const resendVerifyEmail = async (
     await Update(dbTab, dbParam, email, payload);
 
     const rabbitmqPayload: IEmailRequest = {
-      EmailTemplate: "kitchentreg",
+      EmailTemplate: "kitchenreg",
       Type: "Email verification",
       Name: lastName,
       Payload: new Map([["Code", genCode]]),
@@ -492,6 +498,15 @@ export const updateKitchen = async (req: Request, res: Response) => {
       const error = Message(400, NotFoundResponse("Kitchen"));
       return res.status(400).json(error);
     }
+
+    const emptyFields = PayloadCannotContain(editedKitchen, noEditKitchenKeys);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be changed`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    delete editedKitchen.Email;
 
     compareAndUpdateProperties(editedKitchen, isKitchenExist);
     const update = await Update(kTab, dbId, email, isKitchenExist);
@@ -677,49 +692,6 @@ export const getKitchenOrdersByEmail = async (req: Request, res: Response) => {
   } catch (error) {
     const err = Message(500, InternalError);
     return res.status(500).json(err);
-  }
-};
-
-export const compareAndUpdateProperties = (
-  incomingData: any,
-  existingData: any
-) => {
-  const properties = Object.keys(incomingData);
-  const propertiesDB = Object.keys(existingData);
-
-  for (const incomingKey of properties) {
-    const incomingValue = incomingData[incomingKey];
-
-    for (const dbKey of propertiesDB) {
-      if (dbKey === "Id") continue;
-
-      const dbValue = existingData[dbKey];
-
-      if (incomingKey === dbKey) {
-        // typeof will return object if the value is array or object
-        const dbValueType = typeof dbValue === "object";
-        const incomingValueType = typeof incomingValue === "object";
-        const isNullOrUndefined =
-          incomingValue === undefined || incomingValue === null;
-
-        if (dbValueType && incomingValueType && !isNullOrUndefined) {
-          if (Array.isArray(incomingValue)) {
-            const objToList = incomingValue;
-            const modelToList = dbValue || [];
-            objToList.forEach((item) => modelToList.push(item.toString()));
-            existingData[dbKey] = modelToList;
-            break;
-          } else {
-            existingData[dbKey] = incomingValue;
-          }
-        } else if (!dbValueType && !incomingValueType && !isNullOrUndefined) {
-          existingData[dbKey] = incomingValue;
-        }
-        break;
-      } else if (incomingKey !== dbKey) {
-        continue;
-      }
-    }
   }
 };
 

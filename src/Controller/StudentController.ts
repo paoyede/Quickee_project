@@ -58,7 +58,11 @@ import {
   studSignupKeys,
   updateQOrderKeys,
 } from "../Models/DTOs/IStudentDto";
-import { compareAndUpdateProperties } from "./KitchenController";
+import {
+  Validation,
+  compareAndUpdateProperties,
+  isValidPayload,
+} from "../Utilities/Validations";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -619,41 +623,6 @@ export const deleteQuickOrders = async (
     const err = Message(500, InternalError);
     return res.status(500).json(err);
   }
-};
-
-export const Validation = <T extends Record<string, any>>(
-  payload: T
-): string[] => {
-  const emptyOrNullFields: string[] = [];
-
-  Object.entries(payload).forEach(([key, value]) => {
-    if (
-      payload.hasOwnProperty(key) &&
-      typeof key != undefined &&
-      (value === null || value === "")
-    ) {
-      emptyOrNullFields.push(key);
-    }
-  });
-
-  return emptyOrNullFields;
-};
-
-export const isValidPayload = <T extends Record<string, any>>(
-  data: any,
-  dto: string[]
-): data is T => {
-  const interfaceKeys = dto;
-  const payloadKeys = Object.keys(data);
-  // console.log({ ...payloadKeys });
-  // console.log({ ...interfaceKeys });
-
-  if (interfaceKeys.length !== payloadKeys.length) {
-    console.log("first: ", interfaceKeys.length, ", ", payloadKeys.length);
-    return false;
-  }
-
-  return payloadKeys.every((key) => interfaceKeys.includes(key));
 };
 
 function findObjectById(Id: string, list: UpdateItemDto[]) {

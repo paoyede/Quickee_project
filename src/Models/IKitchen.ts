@@ -31,6 +31,7 @@ export interface IAddKitchenStaff {
 }
 
 export interface IKitchenUpdate {
+  Email: string;
   Manager?: string;
   ManagerPhone?: number;
   AdminEmail?: string;

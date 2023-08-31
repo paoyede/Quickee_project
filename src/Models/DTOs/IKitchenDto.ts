@@ -30,6 +30,16 @@ export const createkitchenKeys: string[] = [
   "BankName",
 ];
 
+export const noEditKitchenKeys: string[] = [
+  "KitchenEmail",
+  "ManagerEmail",
+  "Password",
+  "University",
+  "AccountNumber",
+  "AccountName",
+  "BankName",
+];
+
 export const addKitStaffKeys: string[] = [
   "KitchenId",
   "FirstName",

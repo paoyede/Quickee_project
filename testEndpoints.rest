@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNDA0NjExLCJleHAiOjE2OTM0MDgyMTF9.W6sIJcDeEG2_TtBM0MEHhtaJsh3bZ_Nfsb0QLFgAq7U
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMDJiZDJhOTMtZWY2Yi00YWM1LWFjZjAtNzNhMmY2ZDI5NTEzIiwiaWF0IjoxNjkzNDM3Nzk0LCJleHAiOjE2OTM0NDEzOTR9.mqjxNpH5VIm06n1mf41E85yIixv470oml0IpmT3J6Rc
 ###@atk1 = {{atk}}
 # @url = http://54.211.76.116
 # @url = http://192.168.186.240
@@ -53,8 +53,6 @@ Content-Type: application/json
 
 ###
 
-###
-
 PUT {{url}}/Student/VerifyEmail
 Content-Type: application/json
 
@@ -64,8 +62,6 @@ Content-Type: application/json
 }
 
 ###
-
-
 
 POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
 ###
@@ -90,7 +86,7 @@ Authorization: BEARER {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "c7384019-4e4d-4e44-900d-9eaddc1ad97e",
+  "KitchenId": "02bd2a93-ef6b-4ac5-acf0-73a2f6d29513",
   "Description": "Mix egusi and okro soup together",
   "Items": [
     {
@@ -100,12 +96,12 @@ Content-Type: application/json
     },
     {
       "Name": "Fried rice",
-      "Price": 600,
+      "Price": 900,
       "Scoops": 2
     },
     {
-      "Name": "Beef",
-      "Price": 700,
+      "Name": "Chicken",
+      "Price": 1200,
       "Scoops": 1
     },
     {
@@ -156,7 +152,7 @@ Content-Type: application/json
 
 {
   "KitchenName": "RaphaelFood",
-  "KitchenEmail": "support@raphaelfood.com",
+  "KitchenEmail": "raphael.tunji@yahoo.com",
   "ManagerFirstName": "George",
   "ManagerLastName": "George",
   "ManagerPhone": 23481035635487,
@@ -170,8 +166,6 @@ Content-Type: application/json
 
 ###
 
-###
-
 POST {{url}}/Kitchen/SignIn
 Content-Type: application/json
 
@@ -182,21 +176,32 @@ Content-Type: application/json
 
 ###
 
-###
-
-PUT {{url}}/Kitchen/Update?email=support@raphaelfood.com
+PUT {{url}}/Kitchen/VerifyEmail
 Content-Type: application/json
 
 {
+  "EmailOTP": "631462",
+  "Email": "raphael.tunji@yahoo.com"
+}
+
+
+###
+
+GET {{url}}/Kitchen/ResendVerifyEmail?email=raphael.tunji@yahoo.com
+
+###
+
+PUT {{url}}/Kitchen/Update?email=raphael.tunji@yahoo.com
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "BankName":"raphael.tunji@yahoo.com",
   "ManagerPhone": 61982374629
 }
 ###
 
-###
-
-DELETE {{url}}/Kitchen/Delete?email=support@raphaelfood.com
-###
-
+DELETE {{url}}/Kitchen/Delete?email=raphael.tunji@yahoo.com
 ###
 
 POST {{url}}/Kitchen/CreateMenu
@@ -204,8 +209,8 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "c7384019-4e4d-4e44-900d-9eaddc1ad97e",
-  "FoodName": "Ofada",
+  "KitchenId": "02bd2a93-ef6b-4ac5-acf0-73a2f6d29513",
+  "FoodName": "Jollof",
   "Category": "Food",
   "Class": "Rice",
   "Price": 1200,
@@ -215,27 +220,20 @@ Content-Type: application/json
 
 ###
 
-###
-
-PUT {{url}}/Kitchen/UpdateMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
+PUT {{url}}/Kitchen/UpdateMenu?MenuId=a50cc3f8-b081-4536-a6bd-07e9e424f391
+Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "Price": 850
+  "Price": 600
 }
 ###
 
-###
-
 DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
-
 ###
-
-GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=c7384019-4e4d-4e44-900d-9eaddc1ad97e
+GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=02bd2a93-ef6b-4ac5-acf0-73a2f6d29513
 Authorization: Bearer {{atk}}
-
-####
-
+###
 POST {{url}}/Payment/MakePayment?Email=nifemiojinni22@gmail.com
 Content-Type: application/json
 
@@ -247,12 +245,9 @@ Content-Type: application/json
 
 ####
 
-####
-
 GET {{url}}/Payment/VerifyPayment?Reference=IjIcH04
 #1v3ki9pgtp
 #####
-
 
 GET {{url}}/Kitchen/Fetch?food=rice
 
@@ -261,7 +256,6 @@ GET {{url}}/Kitchen/Fetch?food=rice
 DELETE {{url}}/Kitchen/DeleteStaff?email=raphael.tunji@yahoo.com
 
 ###
-
 
 PUT {{url}}/Kitchen/UpdateStaff?email=raphael.tunji@yahoo.com
 Content-Type: application/json
@@ -273,6 +267,5 @@ Content-Type: application/json
 
 ###
 
-
-GET {{url}}/Kitchen/GetKitchenOrders?Email=support@raphaelfood.com
+GET {{url}}/Kitchen/GetKitchenOrders?Email=raphael.tunji@yahoo.com
 Authorization: Bearer {{atk}}
