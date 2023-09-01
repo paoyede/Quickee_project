@@ -45,7 +45,7 @@ export const isValidPayload = <T extends Record<string, any>>(
   // console.log({ ...interfaceKeys });
 
   if (interfaceKeys.length !== payloadKeys.length) {
-    console.log("first: ", interfaceKeys.length, ", ", payloadKeys.length);
+    // console.log("first: ", interfaceKeys.length, ", ", payloadKeys.length);
     return false;
   }
 

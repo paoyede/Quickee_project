@@ -9,17 +9,20 @@ import {
   forgotPassword,
   getKitchenMenusById,
   getKitchenOrdersByEmail,
+  getNGBanks,
   resendVerifyEmail,
   resetPassword,
   signin,
   updateFoodMenu,
   updateKitchen,
   updateKitchenStaff,
+  validateKitchenBank,
   verifyEmail,
 } from "../Controller/KitchenController";
 import { Request, Response, Router } from "express";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
+import { verifyWebhook } from "../Controller/WebhookController";
 
 const kitchenRoute = (producer: Producer) => {
   const router: Router = Router();
@@ -49,6 +52,9 @@ const kitchenRoute = (producer: Producer) => {
   router.delete("/DeleteMenu", authtoken, deleteFoodMenu);
   router.get("/GetKitchenMenus", authtoken, getKitchenMenusById);
   router.get("/GetKitchenOrders", authtoken, getKitchenOrdersByEmail);
+  router.get("/GetBanks", authtoken, getNGBanks);
+  router.get("/ValidateKitchenBank", validateKitchenBank);
+  router.post("/VerifyWebhook", verifyWebhook);
 
   return router;
 };

@@ -63,6 +63,10 @@ import {
   compareAndUpdateProperties,
   isValidPayload,
 } from "../Utilities/Validations";
+import {
+  IGetOrdersDto,
+  IGetStudentOrdersDto,
+} from "../Models/DTOs/IKitchenDto";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -434,6 +438,49 @@ export const saveOrders = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+export const getOrdersByUserEmail = async (req: Request, res: Response) => {
+  try {
+    const email = req.query.Email.toString();
+
+    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+    const udbId = isUserExist.Id;
+    const aQords = await GetAllById(aOrdTab, uid, udbId);
+    let newAQorders: IGetStudentOrdersDto = {
+      UserId: aQords.at(0).UserId,
+      Orders: [],
+    };
+
+    const odbId = "OrderId";
+    for (let index = 0; index < aQords.length; index++) {
+      let eOrders = aQords[index];
+      const oid = eOrders.OrderId;
+      // delete eOrders.CreatedAt;
+      delete eOrders.UpdatedAt;
+      delete eOrders.UserId;
+      let order: IGetOrdersDto = { ...eOrders };
+      const orders = await GetAllById(ordTab, odbId, oid);
+      order.Items = orders;
+      for (let i = 0; i < orders.length; i++) {
+        delete orders[i].CreatedAt;
+        delete orders[i].UpdatedAt;
+        delete orders[i].OrderId;
+        delete orders[i].Id;
+      }
+      newAQorders.Orders.push(order);
+    }
+
+    const success = Message(200, FetchedSuccess, newAQorders);
+    return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
 export const saveQuickOrders = async (
   req: Request,
   res: Response
@@ -494,7 +541,7 @@ export const saveQuickOrders = async (
   }
 };
 
-export const GetQuickOrdersByUserId = async (
+export const getQuickOrdersByUserId = async (
   req: Request,
   res: Response
 ): Promise<any> => {

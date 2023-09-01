@@ -9,6 +9,7 @@ export interface IKitchenCreate {
   IsVerifiedEmail: boolean;
   University: string;
   AccountNumber: number;
+  BankCode: number;
   AccountName: string;
   BankName: string;
   VerificationCode: string;
@@ -67,4 +68,46 @@ export interface UpdateFoodMenu {
   Class?: string;
   Price?: number;
   Status?: string;
+}
+
+export interface IValidateBank {
+  BankCode: string;
+  AccountNumber: string;
+  ShouldProceed: boolean;
+}
+
+export interface IRecipient {
+  KitchenId: string;
+  BankName: string;
+  Type: string;
+  AccountName: string;
+  AccountNumber: string;
+  BankCode: string;
+  Currency: string;
+  RecipientCode: string;
+}
+
+export interface IPaymentDto {
+  KitchenId: string;
+  UserId: string;
+  OrderId: string;
+  TrxRef: string;
+  IsSuccess: boolean;
+  Amount: number;
+}
+
+export interface ITransferDto {
+  source: string;
+  amount: string;
+  reference: string;
+  recipient: string;
+  reason: string;
+}
+
+export interface ITransferDBDto {
+  KitchenId: string;
+  Reference: string;
+  RecipientCode: string;
+  TransferCode?: string;
+  Status: string;
 }

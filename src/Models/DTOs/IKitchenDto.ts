@@ -9,6 +9,7 @@ export interface IKitchenCreateDto {
   IsVerifiedEmail: boolean;
   University: string;
   AccountNumber: number;
+  BankCode: number;
   AccountName: string;
   BankName: string;
   VerificationCode: string;
@@ -26,8 +27,15 @@ export const createkitchenKeys: string[] = [
   "Password",
   "University",
   "AccountNumber",
+  "BankCode",
   "AccountName",
   "BankName",
+];
+
+export const validateBankKeys: string[] = [
+  "BankCode",
+  "AccountNumber",
+  "ShouldProceed",
 ];
 
 export const noEditKitchenKeys: string[] = [
@@ -101,6 +109,11 @@ export interface UpdateFoodMenuDto {
 
 export interface IGetKitchenOrdersDto {
   KitchenId: string;
+  Orders: IGetOrdersDto[];
+}
+
+export interface IGetStudentOrdersDto {
+  UserId: string;
   Orders: IGetOrdersDto[];
 }
 

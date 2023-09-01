@@ -3,6 +3,7 @@ import {
   IGetOrdersDto,
   addKitStaffKeys,
   noEditKitchenKeys,
+  validateBankKeys,
 } from "./../Models/DTOs/IKitchenDto";
 import {
   CreateFoodMenu,
@@ -11,6 +12,8 @@ import {
   IKitchenLogin,
   IKitchenUpdate,
   IKitchenUpdateStaff,
+  IRecipient,
+  IValidateBank,
   UpdateFoodMenu,
 } from "./../Models/IKitchen";
 import {
@@ -43,6 +46,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../Services/Implementations/JwtService";
+import NodeCache from "node-cache";
 import {
   CryptoGenSixDigitNum,
   RandGenSixDigitNum,
@@ -62,6 +66,15 @@ import {
   compareAndUpdateProperties,
   isValidPayload,
 } from "../Utilities/Validations";
+import { axiosWithAuth } from "../Utilities/ReusableAxios";
+import { paystacksecret } from "../Utilities/Configs";
+import {
+  createKitchenRecipientCode,
+  validateBankAccount,
+} from "../Services/Implementations/PayStack";
+
+const axioWith = axiosWithAuth(paystacksecret, "https://api.paystack.co");
+const cache = new NodeCache();
 
 const kTab = "Kitchen";
 const kstaffTab = "KitchenStaff";
@@ -74,6 +87,7 @@ const forgot = "ForgotPassword";
 const ordTab = "Orders";
 const aOrdTab = "AllUsersOrders";
 const dbkId = "KitchenId";
+const recTab = "Recipients";
 
 export const createKitchen = async (
   producer: Producer,
@@ -94,6 +108,8 @@ export const createKitchen = async (
       const error = Message(400, errorMessage);
       return res.status(400).json(error);
     }
+
+    delete checkPayload.BankCode;
 
     const payload: IKitchenCreate = { ...checkPayload };
 
@@ -138,6 +154,94 @@ export const createKitchen = async (
   } catch (error) {
     const err = Message(500, InternalError);
     res.status(500).json(err);
+  }
+};
+
+export const validateKitchenBank = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const payload: IValidateBank = req.body;
+
+    if (!isValidPayload(payload, validateBankKeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(payload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    const email = req.query.email.toString();
+    var isUserExist = await FirstOrDefault(kTab, dbId, email);
+
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+    const dib = isUserExist.Id;
+    var checkRecTable = await FirstOrDefault(recTab, dbkId, dib);
+    if (checkRecTable != null) {
+      const error = Message(400, AlreadyExistResponse("Recipient"));
+      return res.status(400).json(error);
+    }
+
+    const acNum = payload.AccountNumber;
+    const bcode = payload.BankCode;
+    let response;
+    let validateAccount = await validateBankAccount(acNum, bcode);
+
+    // console.log(validateAccount);
+
+    if (validateAccount.Status === false) {
+      const errorMessage = validateAccount.Message;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+    response = validateAccount;
+    const name = validateAccount.data.account_name;
+    const recipientPayload = {
+      type: "nuban",
+      name: name,
+      account_number: acNum,
+      bank_code: bcode,
+      currency: "NGN",
+    };
+
+    let createRecipient;
+    if (payload.ShouldProceed === true) {
+      createRecipient = await createKitchenRecipientCode(recipientPayload);
+      if (createRecipient.status === true) {
+        const currency = createRecipient.data.currency;
+        const type = createRecipient.data.type;
+        const bankName = createRecipient.data.details.bank_name;
+        const recCode = createRecipient.data.recipient_code;
+
+        const recipient: IRecipient = {
+          KitchenId: dib,
+          BankName: bankName,
+          Type: type,
+          AccountName: name,
+          AccountNumber: acNum,
+          BankCode: bcode,
+          Currency: currency,
+          RecipientCode: recCode,
+        };
+
+        await AddToDB(recTab, recipient);
+        response = Message(200, createRecipient.message);
+      } else if (createRecipient.status === false) {
+        return res.status(200).json(Message(400, "Could not create recipient"));
+      }
+    }
+    return res.status(200).json(response);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
   }
 };
 
@@ -311,12 +415,15 @@ export const signin = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const payload: IVerifyEmail = req.body;
-    var isUserExist = await FirstOrDefault(kTab, dbId, payload.Email);
-    if (isUserExist === null) {
+    var checkKitchen = await FirstOrDefault(kTab, dbId, payload.Email);
+    var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, payload.Email);
+
+    if (checkKitchen === null && checkstaff === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
+    var isUserExist = checkKitchen != null ? checkKitchen : checkstaff;
     if (isUserExist.VerificationCode != payload.EmailOTP) {
       const error = Message(400, WrongOtp);
       return res.status(400).json(error);
@@ -328,7 +435,9 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
 
     const updateEmail = { UpdatedAt: new Date(), IsVerifiedEmail: true };
-    await Update(kTab, dbId, payload.Email, updateEmail);
+    const tab = checkKitchen != null ? kTab : kstaffTab;
+    const dbParam = checkKitchen != null ? dbId : dbEmail;
+    await Update(tab, dbParam, payload.Email, updateEmail);
 
     const success = Message(200, UpdateSuccess);
     return res.status(200).json(success);
@@ -672,8 +781,8 @@ export const getKitchenOrdersByEmail = async (req: Request, res: Response) => {
     for (let index = 0; index < aQords.length; index++) {
       let eOrders = aQords[index];
       const oid = eOrders.OrderId;
-      delete eOrders.CreatedAt;
-      // delete eOrders.UpdatedAt;
+      // delete eOrders.CreatedAt;
+      delete eOrders.UpdatedAt;
       delete eOrders.KitchenId;
       let order: IGetOrdersDto = { ...eOrders };
       const orders = await GetAllById(ordTab, odbId, oid);
@@ -693,6 +802,33 @@ export const getKitchenOrdersByEmail = async (req: Request, res: Response) => {
     const err = Message(500, InternalError);
     return res.status(500).json(err);
   }
+};
+
+export const getNGBanks = async (req: Request, res: Response) => {
+  try {
+    const country = "NG";
+    const isCached = CheckCacheResource(country, res);
+    const path = "/bank?currency=NGN";
+    if (!isCached) {
+      const response = await axioWith.get(path);
+      cache.set(country, response.data);
+      return res.status(200).json(response.data);
+    }
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+const CheckCacheResource = (cacheKey: string, res: Response): boolean => {
+  // Check if the data is already cached
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    // console.log(`cached data for key: ${cacheKey} is available`);
+    res.status(200).json(cachedData);
+    return true;
+  }
+  return false;
 };
 
 const extractSurname = (fullName: string) => {

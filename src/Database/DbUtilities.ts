@@ -53,7 +53,17 @@ export const QuickOrders =
 
 export const PaymentsTable =
   `CREATE TABLE "Payments" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "UserId" UUID, "OrderId" TEXT,` +
-  `"TrxRef" VARCHAR, "IsSuccess" BOOLEAN DEFAULT false,` +
+  `"TrxRef" VARCHAR, "IsSuccess" BOOLEAN DEFAULT false, "Amount" BIGINT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const RecipientsTable =
+  `CREATE TABLE "Recipients" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "BankName" TEXT, "Type" TEXT, "AccountName" TEXT,` +
+  `"AccountNumber" TEXT, "BankCode" TEXT, "Currency" TEXT, "RecipientCode" VARCHAR,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const TransfersTable =
+  `CREATE TABLE "Transfers" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "Reference" VARCHAR,` +
+  `"RecipientCode" VARCHAR, "TransferCode" VARCHAR, "Status" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const OrdersTable =
