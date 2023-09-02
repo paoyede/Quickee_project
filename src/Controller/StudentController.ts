@@ -30,6 +30,7 @@ import {
   FirstOrDefault,
   GetAll,
   GetAllById,
+  QueryParamsFirstOrDefault,
   Remove,
   Update,
 } from "../Infrastructure/Repository";
@@ -76,25 +77,27 @@ import {
 } from "../Services/Implementations/PayStack";
 import { IPayment } from "../Models/PayStack";
 import { ITransferDBDto, ITransferDto } from "../Models/IKitchen";
-
-const stdTab = "Student";
-const dbId = "Email";
-const dbid2 = "UserName";
-const rtokTab = "RefreshToken";
-const ordTab = "Orders";
-const aOrdTab = "AllUsersOrders";
-const qordTab = "QuickOrders";
-const aqOrdTab = "AllQuickOrders";
-const forgot = "ForgotPassword";
-const kTab = "Kitchen";
-const kId = "KitchenId";
-const odbId = "OrderId";
-const uid = "UserId";
-const depTab = "Deposits";
-const rec = "Recipients";
-const trTab = "Transfers";
-const trRef = "Reference";
-const wTab = "Wallets";
+import {
+  aOrdTab,
+  aqOrdTab,
+  dbEmail,
+  dbid2,
+  dbkId,
+  depTab,
+  forgot,
+  kTab,
+  kmTab,
+  ordTab,
+  orderId,
+  qordTab,
+  recTab,
+  rtokTab,
+  sTab,
+  trRef,
+  trTab,
+  uid,
+  wTab,
+} from "../Data/TableNames";
 
 const currentTime = new Date();
 
@@ -125,7 +128,7 @@ export const signup = async (
     };
     const userId = payload.Email;
     // console.log(userId);
-    var isUserExist = await FirstOrDefault(stdTab, dbId, userId);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, userId);
     if (isUserExist != null) {
       const error = Message(400, AlreadyExistResponse("User"));
       return res.status(400).json(error);
@@ -137,13 +140,13 @@ export const signup = async (
     const hash = await bcrypt.hash(payload.Password, 10);
     payload.Password = hash;
     const vcode = "VerificationCode";
-    const genCode = await CryptoGenSixDigitNum(6, stdTab, vcode);
+    const genCode = await CryptoGenSixDigitNum(6, sTab, vcode);
     payload.VerificationCode = genCode;
     const currentTime = new Date();
     currentTime.setMinutes(currentTime.getMinutes() + 5);
     payload.ExpiresAt = currentTime;
 
-    const response = await AddToDB(stdTab, payload);
+    const response = await AddToDB(sTab, payload);
     delete response.VerificationCode;
     delete response.ExpiresAt;
     const success = Message(200, CreateSuccess, response);
@@ -187,7 +190,7 @@ export const signin = async (req: Request, res: Response) => {
     }
     const payload: ISignIn = { ...checkPayload };
     const userId = payload.UserName;
-    var isUserExist = await FirstOrDefault(stdTab, dbid2, userId);
+    var isUserExist = await FirstOrDefault(sTab, dbid2, userId);
 
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
@@ -236,13 +239,12 @@ export const forgotPassword = async (
 ) => {
   try {
     const email = req.query.email.toString();
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
-    const forgot = "ForgotPassword";
     const userEmail = isUserExist.Email;
     const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
     const currentTime = new Date();
@@ -309,7 +311,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     const userId = isOtpExist.UserEmail;
     const hash = await bcrypt.hash(payload.NewPassword, 10);
     const newPassword = { Password: hash };
-    await Update(stdTab, "Email", userId, newPassword);
+    await Update(sTab, "Email", userId, newPassword);
 
     const success = Message(200, UpdateSuccess);
     return res.status(200).json(success);
@@ -329,7 +331,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
       return res.status(400).json(error);
     }
 
-    var isUserExist = await FirstOrDefault(stdTab, dbId, payload.Email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, payload.Email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
@@ -346,7 +348,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
 
     const updateEmail = { UpdatedAt: new Date(), IsVerifiedEmail: true };
-    await Update(stdTab, dbId, payload.Email, updateEmail);
+    await Update(sTab, dbEmail, payload.Email, updateEmail);
 
     const success = Message(200, UpdateSuccess);
     return res.status(200).json(success);
@@ -364,19 +366,19 @@ export const resendVerifyEmail = async (
   try {
     const email = req.query.email.toString();
     console.log("Email: ", email);
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
     const vcode = "VerificationCode";
-    const genCode = await CryptoGenSixDigitNum(6, stdTab, vcode);
+    const genCode = await CryptoGenSixDigitNum(6, sTab, vcode);
     const currentTime = new Date();
     currentTime.setMinutes(currentTime.getMinutes() + 5);
 
     const payload = { ExpiresAt: currentTime, VerificationCode: genCode };
-    await Update(stdTab, dbId, email, payload);
+    await Update(sTab, dbEmail, email, payload);
 
     const rabbitmqPayload: IEmailRequest = {
       EmailTemplate: "studentreg",
@@ -424,10 +426,23 @@ export const saveOrders = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json(error);
     }
 
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
+    }
+
+    // ensure there is scoops for kitchen menu
+    for (let index = 0; index < payload.Items.length; index++) {
+      const eOrder = payload.Items[index];
+      const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
+      const fetchMenu = await QueryParamsFirstOrDefault(kmTab, queryParams);
+      const qty = fetchMenu.TotalQuantity;
+      if (qty < eOrder.Scoops && qty != 0) {
+        const msg = `Not enough scoops for ${eOrder.Name}, we have ${qty} scoops left`;
+        const error = Message(400, msg);
+        return res.status(400).json(error);
+      }
     }
 
     const totalSum = payload.Items.reduce((sum, item) => sum + item.Price, 0);
@@ -459,7 +474,7 @@ export const getOrdersByUserEmail = async (req: Request, res: Response) => {
   try {
     const email = req.query.Email.toString();
 
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
@@ -471,7 +486,6 @@ export const getOrdersByUserEmail = async (req: Request, res: Response) => {
       Orders: [],
     };
 
-    const odbId = "OrderId";
     for (let index = 0; index < aQords.length; index++) {
       let eOrders = aQords[index];
       const oid = eOrders.OrderId;
@@ -479,7 +493,7 @@ export const getOrdersByUserEmail = async (req: Request, res: Response) => {
       delete eOrders.UpdatedAt;
       delete eOrders.UserId;
       let order: IGetOrdersDto = { ...eOrders };
-      const orders = await GetAllById(ordTab, odbId, oid);
+      const orders = await GetAllById(ordTab, orderId, oid);
       order.Items = orders;
       for (let i = 0; i < orders.length; i++) {
         delete orders[i].CreatedAt;
@@ -527,7 +541,7 @@ export const saveQuickOrders = async (
       return res.status(400).json(error);
     }
 
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
@@ -565,7 +579,7 @@ export const getQuickOrdersByUserId = async (
   try {
     const email = req.query.Email.toString();
 
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
@@ -578,7 +592,7 @@ export const getQuickOrdersByUserId = async (
       const oid = eOrders.OrderId;
       delete eOrders.CreatedAt;
       delete eOrders.UpdatedAt;
-      const aqOrders = await GetAllById(qordTab, odbId, oid);
+      const aqOrders = await GetAllById(qordTab, orderId, oid);
       const nobj: IUpdateQuickOrderDto = { ...eOrders };
       nobj.Items = aqOrders;
       newAQorders.push(nobj);
@@ -621,14 +635,14 @@ export const updateQuickOrders = async (
       return res.status(400).json(error);
     }
 
-    var isUserExist = await FirstOrDefault(stdTab, dbId, email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
       return res.status(400).json(error);
     }
 
     const ordId = payload.OrderId;
-    var isQuickOrderExist = await FirstOrDefault(aqOrdTab, odbId, ordId);
+    var isQuickOrderExist = await FirstOrDefault(aqOrdTab, orderId, ordId);
     if (isQuickOrderExist === null) {
       const error = Message(400, NotFoundResponse("QuickOrder"));
       return res.status(400).json(error);
@@ -643,9 +657,14 @@ export const updateQuickOrders = async (
       OrderName: payload.OrderName,
     };
 
-    const saveToAllorders = await Update(aqOrdTab, odbId, ordId, allOrderData);
+    const saveToAllorders = await Update(
+      aqOrdTab,
+      orderId,
+      ordId,
+      allOrderData
+    );
     const inItems = payload.Items;
-    const getAllQorders = await GetAllById(qordTab, odbId, ordId);
+    const getAllQorders = await GetAllById(qordTab, orderId, ordId);
     const allItems: UpdateItemDto[] = getAllQorders;
     compareAndUpdateProperties(inItems, allItems);
     console.log(allItems);
@@ -692,7 +711,7 @@ export const deleteQuickOrders = async (
 export const fundWallet = async (req: Request, res: Response): Promise<any> => {
   try {
     const payload: IFundWallet = req.body;
-    var isUserExist = await FirstOrDefault(stdTab, dbId, payload.email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, payload.email);
 
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
@@ -738,7 +757,7 @@ export const chargeWallet = async (
 ): Promise<any> => {
   try {
     const payload: IPayment = req.body;
-    var isUserExist = await FirstOrDefault(stdTab, dbId, payload.email);
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, payload.email);
 
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
@@ -752,6 +771,11 @@ export const chargeWallet = async (
       return res.status(400).json(error);
     }
 
+    if (fetchOrder.IsPaid === true) {
+      const error = Message(400, "Payment already made for this order");
+      return res.status(400).json(error);
+    }
+
     var fetchWallet = await FirstOrDefault(wTab, uid, fetchOrder.UserId);
     var balance = parseInt(fetchWallet.Balance);
     var ordAmt = parseInt(fetchOrder.TotalAmount);
@@ -761,12 +785,11 @@ export const chargeWallet = async (
       return res.status(400).json(error);
     }
 
-    if (fetchOrder.IsPaid === true) {
-      const error = Message(400, "Payment already made for this order");
-      return res.status(400).json(error);
-    }
-
-    var fetchRecipient = await FirstOrDefault(rec, kId, fetchOrder.KitchenId);
+    var fetchRecipient = await FirstOrDefault(
+      recTab,
+      dbkId,
+      fetchOrder.KitchenId
+    );
     var kitchen = await FirstOrDefault(kTab, "Id", fetchOrder.KitchenId);
     const ref = await RandGenTrxRef(17, trTab, trRef);
 

@@ -24,12 +24,14 @@ export const authtoken = (
   // console.log(token);
 
   if (token == null) {
-    return res.status(401).json("Unauthorized");
+    res.status(401).json("Unauthorized");
+    return;
   }
 
   verify(token, jwtaccesssecret, (err, user) => {
     if (err) {
-      return res.status(403).json("Forbidden");
+      res.status(403).json("Forbidden");
+      return;
     }
 
     req.user = user as IUser; // Typecast 'user' to IUser

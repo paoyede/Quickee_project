@@ -73,22 +73,22 @@ import {
   createKitchenRecipientCode,
   validateBankAccount,
 } from "../Services/Implementations/PayStack";
+import {
+  aOrdTab,
+  dbEmail,
+  dbId,
+  dbkId,
+  forgot,
+  kTab,
+  kmTab,
+  kstaffTab,
+  ordTab,
+  recTab,
+  rtokTab,
+} from "../Data/TableNames";
 
 const axioWith = axiosWithAuth(paystacksecret, "https://api.paystack.co");
 const cache = new NodeCache();
-
-const kTab = "Kitchen";
-const kstaffTab = "KitchenStaff";
-const kmTab = "KitchenMenu";
-const dbId = "KitchenEmail";
-const dbid2 = "AdminEmail";
-const dbEmail = "Email";
-const rtokTab = "RefreshToken";
-const forgot = "ForgotPassword";
-const ordTab = "Orders";
-const aOrdTab = "AllUsersOrders";
-const dbkId = "KitchenId";
-const recTab = "Recipients";
 
 export const createKitchen = async (
   producer: Producer,
@@ -154,7 +154,7 @@ export const createKitchen = async (
     // console.log(payload);
   } catch (error) {
     const err = Message(500, InternalError);
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -282,6 +282,7 @@ export const addKitchenStaff = async (
       const error = Message(400, AlreadyExistResponse("Staff"));
       return res.status(400).json(error);
     }
+
     const hash = await bcrypt.hash(payload.Password, 10);
     payload.Password = hash;
     const vcode = "VerificationCode";
@@ -309,8 +310,6 @@ export const addKitchenStaff = async (
     const response = await AddToDB(kstaffTab, payload);
     const success = Message(200, CreateSuccess, response);
     return res.status(200).json(success);
-
-    // console.log(payload);
   } catch (error) {
     const err = Message(500, InternalError);
     return res.status(500).json(err);
@@ -325,16 +324,16 @@ export const deleteKitchenStaff = async (
     const email = req.query.email.toString();
     const isKitchenExist = await FirstOrDefault(kstaffTab, dbEmail, email);
 
-    if (isKitchenExist == null) {
+    if (isKitchenExist === null) {
       const error = Message(400, NotFoundResponse("Staff"));
-      res.status(400).json(error);
-    } else {
-      await Remove(kTab, dbId, email);
-      res.status(200).json(DeletedResponse("Staff", email));
+      return res.status(400).json(error);
     }
+
+    await Remove(kstaffTab, dbEmail, email);
+    return res.status(200).json(DeletedResponse("Staff", email));
   } catch (error) {
     const errMessage = Message(500, InternalError);
-    res.status(500).json(errMessage);
+    return res.status(500).json(errMessage);
   }
 };
 
@@ -455,7 +454,7 @@ export const resendVerifyEmail = async (
 ): Promise<any> => {
   try {
     const email = req.query.email.toString();
-    console.log("Email: ", email);
+    // console.log("Email: ", email);
     var checkKitchen = await FirstOrDefault(kTab, dbId, email);
     var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, email);
 
@@ -497,107 +496,107 @@ export const resendVerifyEmail = async (
   }
 };
 
-export const forgotPassword = async (
-  producer: Producer,
-  req: Request,
-  res: Response
-) => {
-  try {
-    const email = req.query.email.toString();
-    let userEmail, userName, isUserExist;
-    isUserExist = await FirstOrDefault(kTab, dbId, email);
-    if (isUserExist != null) {
-      userEmail = isUserExist.KitchenEmail;
-      userName = extractSurname(isUserExist.Manager);
-    } else if (isUserExist === null) {
-      isUserExist = await FirstOrDefault(kTab, dbid2, email);
-      userEmail = isUserExist.AdminEmail;
-      userName = extractSurname(isUserExist.AdminName);
-    }
+// export const forgotPassword = async (
+//   producer: Producer,
+//   req: Request,
+//   res: Response
+// ) => {
+//   try {
+//     const email = req.query.email.toString();
+//     let userEmail, userName, isUserExist;
+//     isUserExist = await FirstOrDefault(kTab, dbId, email);
+//     if (isUserExist != null) {
+//       userEmail = isUserExist.KitchenEmail;
+//       userName = extractSurname(isUserExist.Manager);
+//     } else if (isUserExist === null) {
+//       isUserExist = await FirstOrDefault(kTab, dbid2, email);
+//       userEmail = isUserExist.AdminEmail;
+//       userName = extractSurname(isUserExist.AdminName);
+//     }
 
-    if (isUserExist === null) {
-      const error = Message(400, NotFoundResponse("User"));
-      return res.status(400).json(error);
-    }
+//     if (isUserExist === null) {
+//       const error = Message(400, NotFoundResponse("User"));
+//       return res.status(400).json(error);
+//     }
 
-    const forgot = "ForgotPassword";
-    const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
-    const currentTime = new Date();
-    currentTime.setMinutes(currentTime.getMinutes() + 5);
-    const payload = {
-      UserEmail: userEmail,
-      ForgotPin: forgotDigit,
-      ExpiresAt: currentTime,
-    };
-    var checkForgot = await FirstOrDefault(forgot, "UserEmail", userEmail);
+//     const forgot = "ForgotPassword";
+//     const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
+//     const currentTime = new Date();
+//     currentTime.setMinutes(currentTime.getMinutes() + 5);
+//     const payload = {
+//       UserEmail: userEmail,
+//       ForgotPin: forgotDigit,
+//       ExpiresAt: currentTime,
+//     };
+//     var checkForgot = await FirstOrDefault(forgot, "UserEmail", userEmail);
 
-    if (checkForgot === null) {
-      await AddToDB(forgot, payload);
-    } else {
-      // delete payload.Id;
-      await Update(forgot, "UserEmail", userEmail, payload);
-    }
+//     if (checkForgot === null) {
+//       await AddToDB(forgot, payload);
+//     } else {
+//       // delete payload.Id;
+//       await Update(forgot, "UserEmail", userEmail, payload);
+//     }
 
-    const rabbitmqPayload: IEmailRequest = {
-      EmailTemplate: "forgotpassword",
-      Type: "Reset password",
-      Name: userName,
-      Payload: new Map([["Code", forgotDigit]]),
-      Reciever: email,
-    };
+//     const rabbitmqPayload: IEmailRequest = {
+//       EmailTemplate: "forgotpassword",
+//       Type: "Reset password",
+//       Name: userName,
+//       Payload: new Map([["Code", forgotDigit]]),
+//       Reciever: email,
+//     };
 
-    // Convert the Map to an array of key-value pairs
-    const payloadArray = Array.from(rabbitmqPayload.Payload);
-    // Update the original object with the array
-    rabbitmqPayload.Payload = payloadArray;
+//     // Convert the Map to an array of key-value pairs
+//     const payloadArray = Array.from(rabbitmqPayload.Payload);
+//     // Update the original object with the array
+//     rabbitmqPayload.Payload = payloadArray;
 
-    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
-    producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
+//     const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+//     producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
 
-    const success = Message(200, ResetLinkSent);
-    return res.status(200).json(success);
-  } catch (error) {
-    const errMessage = Message(500, InternalError);
-    res.status(500).json(errMessage);
-  }
-};
+//     const success = Message(200, ResetLinkSent);
+//     return res.status(200).json(success);
+//   } catch (error) {
+//     const errMessage = Message(500, InternalError);
+//     res.status(500).json(errMessage);
+//   }
+// };
 
-export const resetPassword = async (req: Request, res: Response) => {
-  try {
-    const payload: IResetPassword = req.body;
-    var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
-    if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
-      const error = Message(400, WrongOtp);
-      return res.status(400).json(error);
-    }
+// export const resetPassword = async (req: Request, res: Response) => {
+//   try {
+//     const payload: IResetPassword = req.body;
+//     var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
+//     if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
+//       const error = Message(400, WrongOtp);
+//       return res.status(400).json(error);
+//     }
 
-    if (isOtpExist.ExpiresAt < new Date()) {
-      const error = Message(400, ExpiredOTP);
-      return res.status(400).json(error);
-    }
+//     if (isOtpExist.ExpiresAt < new Date()) {
+//       const error = Message(400, ExpiredOTP);
+//       return res.status(400).json(error);
+//     }
 
-    const userId = isOtpExist.UserEmail;
-    const hash = await bcrypt.hash(payload.NewPassword, 10);
+//     const userId = isOtpExist.UserEmail;
+//     const hash = await bcrypt.hash(payload.NewPassword, 10);
 
-    var isUserKitchen = await FirstOrDefault(kTab, dbId, userId);
-    var isUserAdmin = await FirstOrDefault(kTab, dbid2, userId);
-    let dbParam =
-      isUserKitchen != null && isUserAdmin === null
-        ? dbId
-        : isUserKitchen === null && isUserAdmin != null
-        ? dbid2
-        : "";
+//     var isUserKitchen = await FirstOrDefault(kTab, dbId, userId);
+//     var isUserAdmin = await FirstOrDefault(kTab, dbid2, userId);
+//     let dbParam =
+//       isUserKitchen != null && isUserAdmin === null
+//         ? dbId
+//         : isUserKitchen === null && isUserAdmin != null
+//         ? dbid2
+//         : "";
 
-    const newPassword =
-      dbParam === dbId ? { Password: hash } : { AdminPassword: hash };
-    if (dbParam != "") await Update(kTab, dbParam, userId, newPassword);
-    const success = Message(200, UpdateSuccess);
-    return res.status(200).json(success);
-  } catch (error) {
-    const errMessage = Message(500, InternalError);
-    res.status(500).json(errMessage);
-  }
-};
+//     const newPassword =
+//       dbParam === dbId ? { Password: hash } : { AdminPassword: hash };
+//     if (dbParam != "") await Update(kTab, dbParam, userId, newPassword);
+//     const success = Message(200, UpdateSuccess);
+//     return res.status(200).json(success);
+//   } catch (error) {
+//     const errMessage = Message(500, InternalError);
+//     res.status(500).json(errMessage);
+//   }
+// };
 
 export const updateKitchen = async (req: Request, res: Response) => {
   try {

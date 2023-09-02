@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNjE2MDczLCJleHAiOjE2OTM2MTk2NzN9.pPTa7Qqr8PBMnGGsmwrrjHSq1zDMZXNaoY43FBHompk
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNjY1NjgzLCJleHAiOjE2OTM2NjkyODN9.7ljcBwDL2TQhSPre5ucwt1jXJ8Z1tFK5G8hWooSWbJo
 ###@atk1 = {{atk}}
 # @url = http://54.211.76.116
 # @url = http://192.168.186.240
@@ -24,23 +24,6 @@ Content-Type: application/json
     "University": "Elizade University",
     "UserName": ""
 }
-
-# POST {{url}}/Student/SignUp
-# Content-Type: application/json
-
-# {
-#     "FirstName": "Raphael",
-#     "LastName": "Olaiyapo",
-#     "Email": "raphael.tunji@yahoo.com",
-#     "Password": "Alade1&&&",
-#     "IsVerifiedEmail": false,
-#     "University": "Elizade University",
-#     "UserName": ""
-# }
-
-
-###
-
 ###
 
 POST {{url}}/Student/SignIn
@@ -66,8 +49,6 @@ Content-Type: application/json
 POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
 ###
 
-###
-
 PUT {{url}}/Student/ResetPassword
 Content-Type: application/json
 
@@ -76,9 +57,6 @@ Content-Type: application/json
   "OTP": "815730",
   "NewPassword": "@$Nifemi567"
 }
-
-###
-
 ###
 
 POST {{url}}/Student/SaveOrders?Email=raphael.tunji@yahoo.com
@@ -86,22 +64,22 @@ Authorization: BEARER {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "238e4212-4f4f-4e3c-ad20-8512eb11c397",
+  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
   "Description": "Mix egusi and okro soup together",
   "Items": [
     {
-      "Name": "Wheat",
-      "Price": 700,
-      "Scoops": 2
+      "Name": "Jollof",
+      "Price": 600,
+      "Scoops": 1
     },
     {
-      "Name": "Egusi",
+      "Name": "Fried",
       "Price": 300,
       "Scoops": 1
     },
     {
       "Name": "Chicken",
-      "Price": 800,
+      "Price": 1200,
       "Scoops": 1
     },
     {
@@ -111,40 +89,6 @@ Content-Type: application/json
     }
   ]
 }
-
-
-###   [
-#               {
-#                 "Name": "Fried rice",
-#                 "Price": 500,
-#                 "Scoops": 2
-#               },
-#               {
-#                 "Name": "Jollof rice",
-#                 "Price": 700,
-#                 "Scoops": 2
-#               },
-#               {
-#                 "Name": "Chicken",
-#                 "Price": 1200,
-#                 "Scoops": 2
-#               },
-#               {
-#                 "Name": "Coke",
-#                 "Price": 300,
-#                 "Scoops": 2
-#               },
-#               {
-#                 "Name": "Burger",
-#                 "Price": 1200,
-#                 "Scoops": 2
-#               },
-#           ]
-# }
-
-
-###
-
 ###
 
 POST {{url}}/Kitchen/Create
@@ -152,11 +96,11 @@ Content-Type: application/json
 
 {
   "KitchenName": "RaphaelFood",
-  "KitchenEmail": "raphael.tunji@yahoo.com",
+  "KitchenEmail": "aladeraphredo@yahoo.com",
   "ManagerFirstName": "George",
   "ManagerLastName": "George",
   "ManagerPhone": 23481035635487,
-  "ManagerEmail": "raphael.tunji@yahoo.com",
+  "ManagerEmail": "aladeraphredo@yahoo.com",
   "Password": "Christi@567",
   "University": "Elizade University, Ondo",
   "AccountNumber": 3045313300,
@@ -171,7 +115,7 @@ POST {{url}}/Kitchen/SignIn
 Content-Type: application/json
 
 {
-  "Email": "nifemiojinni22@gmail.com",
+  "Email": "raphael.tunji@yahoo.com",
   "Password": "Alade1&&&"
 }
 
@@ -181,17 +125,14 @@ PUT {{url}}/Kitchen/VerifyEmail
 Content-Type: application/json
 
 {
-  "EmailOTP": "498342",
-  "Email": "nifemiojinni22@gmail.com"
+  "EmailOTP": "085119",
+  "Email": "raphael.tunji@yahoo.com"
 }
 
 
 ###
 
 GET {{url}}/Kitchen/ResendVerifyEmail?email=nifemiojinni22@gmail.com
-
-###
-
 ###
 
 PUT {{url}}/Kitchen/UpdateStaff?email=nifemiojinni22@gmail.com
@@ -217,9 +158,8 @@ Content-Type: application/json
 DELETE {{url}}/Kitchen/Delete?email=raphael.tunji@yahoo.com
 ###
 
-###
-
 DELETE {{url}}/Kitchen/DeleteStaff?email=raphael.tunji@yahoo.com
+Authorization: Bearer {{atk}}
 
 ###
 
@@ -228,28 +168,30 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "238e4212-4f4f-4e3c-ad20-8512eb11c397",
-  "FoodName": "Jollof",
+  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "FoodName": "Beef",
   "Category": "Food",
-  "Class": "Rice",
-  "Price": 1200,
-  "TotalQuantity": 200,
+  "Class": "Meat",
+  "Price": 300,
+  "TotalQuantity": 350,
   "Status": "available"
 }
 
 ###
 
-PUT {{url}}/Kitchen/UpdateMenu?MenuId=a50cc3f8-b081-4536-a6bd-07e9e424f391
+PUT {{url}}/Kitchen/UpdateMenu?MenuId=755314fa-6216-4533-9aa5-6a82b1677a92
 Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "Price": 600
+  "Price": 300,
+  "TotalQuantity": 50
 }
 ###
 
 DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
 ###
+
 GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=e4e73045-6827-488f-a833-a907bc5ea5f8
 Authorization: Bearer {{atk}}
 ###
@@ -259,7 +201,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "orderId": "e2165f27-bb3f-4d76-b67a-e9093bd13543",
+  "orderId": "213c3f84-9088-4af9-a769-f51f8032513e",
   "email": "nifemiojinni22@gmail.com",
   "amount": 0
 }
@@ -275,7 +217,20 @@ GET {{url}}/Kitchen/Fetch?food=rice
 
 ###
 
-DELETE {{url}}/Kitchen/DeleteStaff?email=raphael.tunji@yahoo.com
+POST {{url}}/Kitchen/AddStaff
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "FirstName": "Raphael",
+  "LastName": "Olaiyapo",
+  "Email": "raphael.tunji@yahoo.com",
+  "Password": "Alade1&&&",
+  "Phone": 2348102242355,
+  "University": "Elizade University",
+  "Role": "basic"
+}
 
 ###
 
@@ -321,7 +276,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "amount": 7500
+  "amount": 4000
 }
 
 ###
@@ -332,7 +287,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "orderId": "72b16874-97b3-4129-bb3f-408b2e0b67d4"
+  "orderId": "1ae1a994-42f2-4528-877a-4d19f9082369"
 }
 
 ###

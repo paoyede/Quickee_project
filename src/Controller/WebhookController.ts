@@ -3,25 +3,37 @@ import crypto from "crypto";
 import { paystacksecret } from "../Utilities/Configs";
 import { Message } from "../Response/IResponse";
 import { InternalError } from "../Response/Responses";
-import { AddToDB, FirstOrDefault, Update } from "../Infrastructure/Repository";
+import {
+  AddToDB,
+  FirstOrDefault,
+  GetAllById,
+  QueryParamsFirstOrDefault,
+  Update,
+} from "../Infrastructure/Repository";
 import { IPaymentDto, ITransferDBDto, ITransferDto } from "../Models/IKitchen";
 import { transferToKitchen } from "../Services/Implementations/PayStack";
 import { RandGenTrxRef } from "../Utilities/RandomNumber";
 import { IDebit, IWallet } from "../Models/IStudent";
+import {
+  Id,
+  aOrdTab,
+  dbkId,
+  debTab,
+  depTab,
+  kTab,
+  kmTab,
+  ordTab,
+  orderId,
+  pTab,
+  recTab,
+  sTab,
+  trRef,
+  trTab,
+  trxRef,
+  uid,
+  wTab,
+} from "../Data/TableNames";
 
-const aOrds = "AllUsersOrders";
-const trxRef = "TrxRef";
-const pTab = "Payments";
-const rec = "Recipients";
-const kId = "KitchenId";
-const ktab = "Kitchen";
-const trTab = "Transfers";
-const trRef = "Reference";
-const depTab = "Deposits";
-const sTab = "Student";
-const uid = "UserId";
-const wTab = "Wallets";
-const debTab = "Debits";
 const currentTime = new Date();
 
 let amount;
@@ -42,10 +54,11 @@ export const verifyWebhook = async (req: Request, res: Response) => {
       if (event.event === "charge.success") {
         const reference = data.reference;
         const refLength = reference.length;
-        if (refLength === 7) {
-          var fetchOrder = await FirstOrDefault(aOrds, trxRef, reference);
+        if (refLength === 7 /* card payment */) {
+          var fetchOrder = await FirstOrDefault(aOrdTab, trxRef, reference);
           const kitId = fetchOrder.KitchenId;
-          await Update(aOrds, trxRef, reference, {
+          const ordId = fetchOrder.OrderId;
+          await Update(aOrdTab, trxRef, reference, {
             ...fetchOrder,
             IsPaid: true,
             UpdatedAt: currentTime,
@@ -54,15 +67,15 @@ export const verifyWebhook = async (req: Request, res: Response) => {
           const payment: IPaymentDto = {
             KitchenId: kitId,
             UserId: fetchOrder.UserId,
-            OrderId: fetchOrder.OrderId,
+            OrderId: ordId,
             TrxRef: fetchOrder.TrxRef,
             IsSuccess: true,
             Amount: fetchOrder.TotalAmount,
           };
 
           await AddToDB(pTab, payment);
-          var fetchRecipient = await FirstOrDefault(rec, kId, kitId);
-          var kitchen = await FirstOrDefault(ktab, "Id", kitId);
+          var fetchRecipient = await FirstOrDefault(recTab, dbkId, kitId);
+          var kitchen = await FirstOrDefault(kTab, "Id", kitId);
           const ref = await RandGenTrxRef(16, trTab, trRef);
 
           const transfer: ITransferDto = {
@@ -77,17 +90,31 @@ export const verifyWebhook = async (req: Request, res: Response) => {
 
           const transferdb: ITransferDBDto = {
             KitchenId: kitId,
-            OrderId: fetchOrder.OrderId,
+            OrderId: ordId,
             RecipientCode: fetchRecipient.RecipientCode,
             Reference: ref,
             Status: "pending",
           };
 
           await AddToDB(trTab, transferdb);
-        } else if (refLength === 8) {
+
+          // ensure update kitchen menu total quantity
+          const payload = await GetAllById(ordTab, orderId, ordId);
+          for (let index = 0; index < payload.length; index++) {
+            const eOrder = payload[index];
+            const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
+            const fetchMenu = await QueryParamsFirstOrDefault(
+              kmTab,
+              queryParams
+            );
+            const qty = parseInt(fetchMenu.TotalQuantity);
+            const ordQty = parseInt(eOrder.Scoops);
+            await Update(kmTab, Id, fetchMenu.Id, {
+              TotalQuantity: qty - ordQty,
+            });
+          }
+        } else if (refLength === 8 /*funding wallet */) {
           var fetchDep = await FirstOrDefault(depTab, trxRef, reference);
-          // console.log("data: ", event);
-          // res.sendStatus(200);
           var ooid = fetchDep.UserId;
           await Update(depTab, trxRef, reference, {
             ...fetchDep,
@@ -124,14 +151,16 @@ export const verifyWebhook = async (req: Request, res: Response) => {
         var transfer = await FirstOrDefault(trTab, trRef, ref);
         // console.log("first: ", transfer.Status);
         if (transfer.Status != "successful") {
-          const kitchen = await FirstOrDefault(ktab, "Id", transfer.KitchenId);
+          const kitchen = await FirstOrDefault(kTab, "Id", transfer.KitchenId);
           const dboid = "OrderId";
           const oid = transfer.OrderId;
-          const fetchOrder = await FirstOrDefault(aOrds, dboid, oid);
+          const fetchOrder = await FirstOrDefault(aOrdTab, dboid, oid);
+          const kitId = fetchOrder.KitchenId;
+          const ordId = fetchOrder.OrderId;
 
           await Update(trTab, trRef, ref, payload);
 
-          if (refLength === 17) {
+          if (refLength === 17 /* buy from wallet */) {
             const amount = data.amount / 100;
             const debit: IDebit = {
               Amount: amount,
@@ -146,13 +175,30 @@ export const verifyWebhook = async (req: Request, res: Response) => {
             await Update(wTab, uid, usId, {
               Balance: fetchWallet.Balance - amount,
             });
-            await Update(aOrds, trxRef, fetchOrder.TrxRef, {
+            await Update(aOrdTab, trxRef, fetchOrder.TrxRef, {
               ...fetchOrder,
               IsPaid: true,
               UpdatedAt: currentTime,
             });
 
             await AddToDB(debTab, debit);
+
+            // ensure update kitchen menu total quantity
+            const payload = await GetAllById(ordTab, orderId, ordId);
+            for (let index = 0; index < payload.length; index++) {
+              const eOrder = payload[index];
+              const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
+              const fetchMenu = await QueryParamsFirstOrDefault(
+                kmTab,
+                queryParams
+              );
+              const qty = parseInt(fetchMenu.TotalQuantity);
+              const ordQty = parseInt(eOrder.Scoops);
+              await Update(kmTab, Id, fetchMenu.Id, {
+                TotalQuantity: qty - ordQty,
+              });
+            }
+
             // return res
             //   .status(500)
             //   .json(Message(200, "Wallet payment successful"));

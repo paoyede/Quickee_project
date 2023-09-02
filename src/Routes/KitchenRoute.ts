@@ -6,12 +6,12 @@ import {
   deleteFoodMenu,
   deleteKitchen,
   deleteKitchenStaff,
-  forgotPassword,
+  // forgotPassword,
   getKitchenMenusById,
   getKitchenOrdersByEmail,
   getNGBanks,
   resendVerifyEmail,
-  resetPassword,
+  // resetPassword,
   signin,
   updateFoodMenu,
   updateKitchen,
@@ -19,7 +19,7 @@ import {
   validateKitchenBank,
   verifyEmail,
 } from "../Controller/KitchenController";
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
 import { verifyWebhook } from "../Controller/WebhookController";
@@ -32,12 +32,8 @@ const kitchenRoute = (producer: Producer) => {
     createKitchen(producer, req, res)
   );
   router.post("/SignIn", signin);
-  router.post(
-    "/AddStaff",
-    (req: Request, res: Response, next: NextFunction) => {
-      authtoken(req, res, next);
-      addKitchenStaff(producer, req, res);
-    }
+  router.post("/AddStaff", authtoken, (req: Request, res: Response) =>
+    addKitchenStaff(producer, req, res)
   );
   router.delete("/DeleteStaff", authtoken, deleteKitchenStaff);
   router.put("/UpdateStaff", authtoken, updateKitchenStaff);
@@ -45,10 +41,10 @@ const kitchenRoute = (producer: Producer) => {
   router.get("/ResendVerifyEmail", (req: Request, res: Response) =>
     resendVerifyEmail(producer, req, res)
   );
-  router.post("/ForgotPassword", (req: Request, res: Response) =>
-    forgotPassword(producer, req, res)
-  );
-  router.put("/ResetPassword", resetPassword);
+  // router.post("/ForgotPassword", (req: Request, res: Response) =>
+  //   forgotPassword(producer, req, res)
+  // );
+  // router.put("/ResetPassword", resetPassword);
   router.put("/Update", authtoken, updateKitchen);
   router.delete("/Delete", authtoken, deleteKitchen);
   router.post("/CreateMenu", authtoken, createFoodMenu);
