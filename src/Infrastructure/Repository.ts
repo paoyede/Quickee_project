@@ -47,6 +47,30 @@ export const FirstOrDefault = async (
   }
 };
 
+export const QueryParamsFirstOrDefault = async (
+  tableName: string,
+  params: { [key: string]: any }
+): Promise<any> => {
+  try {
+    const paramKeys = Object.keys(params);
+    const paramValues = paramKeys.map((key) => params[key]);
+    const whereConditions = paramKeys
+      .map((key, index) => `"${key}" = $${index + 1}`)
+      .join(" AND ");
+
+    const fetchByIdQuery = `SELECT * FROM "${tableName}" WHERE ${whereConditions}`;
+    const result = await client.query(fetchByIdQuery, paramValues);
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    }
+
+    return null;
+  } catch (error) {
+    // Handle or re-throw the error as needed
+    throw error;
+  }
+};
+
 export const AddToDB = async (
   tableName: string,
   object: object

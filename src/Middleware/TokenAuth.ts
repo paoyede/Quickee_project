@@ -17,21 +17,19 @@ export const authtoken = (
   req: CustomRequest<IUser>, // Use the custom Request type
   res: Response<any, Record<string, any>>,
   next: NextFunction
-): void => {
+): any => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   // Bearer TOKEN
   // console.log(token);
 
   if (token == null) {
-    res.status(401).json("Unauthorized");
-    return;
+    return res.status(401).json("Unauthorized");
   }
 
   verify(token, jwtaccesssecret, (err, user) => {
     if (err) {
-      res.status(403).json("Forbidden");
-      return;
+      return res.status(403).json("Forbidden");
     }
 
     req.user = user as IUser; // Typecast 'user' to IUser

@@ -37,6 +37,7 @@ import {
   FirstOrDefault,
   GetAll,
   GetAllById,
+  QueryParamsFirstOrDefault,
   Remove,
   Update,
 } from "../Infrastructure/Repository";
@@ -312,7 +313,7 @@ export const addKitchenStaff = async (
     // console.log(payload);
   } catch (error) {
     const err = Message(500, InternalError);
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -671,7 +672,10 @@ export const createFoodMenu = async (
     const dbkId = "FoodName";
     const dbkId2 = "Id";
     var isKitchenExist = await FirstOrDefault(kTab, dbkId2, kId2);
-    var isFoodExist = await FirstOrDefault(kmTab, dbkId, kId);
+    // var isFoodExist = await FirstOrDefault(kmTab, dbkId, kId);
+    const queryParams = { KitchenId: kId2, FoodName: kId };
+    var isFoodExist = await QueryParamsFirstOrDefault(kmTab, queryParams);
+
     if (isKitchenExist === null) {
       const error = Message(400, NotFoundResponse("Kitchen"));
       res.status(400).json(error);

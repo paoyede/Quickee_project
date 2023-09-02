@@ -86,7 +86,8 @@ export const verifyWebhook = async (req: Request, res: Response) => {
           await AddToDB(trTab, transferdb);
         } else if (refLength === 8) {
           var fetchDep = await FirstOrDefault(depTab, trxRef, reference);
-          console.log("first: ", fetchDep);
+          // console.log("data: ", event);
+          // res.sendStatus(200);
           var ooid = fetchDep.UserId;
           await Update(depTab, trxRef, reference, {
             ...fetchDep,
@@ -166,8 +167,8 @@ export const verifyWebhook = async (req: Request, res: Response) => {
       }
     }
 
-    return res.status(200).json("Success");
-    // return res.sendStatus(200);
+    // return res.status(200).json("Success");
+    return res.sendStatus(200);
   } catch (error) {
     console.log("catch error: ", error);
     const errMessage = Message(500, InternalError);

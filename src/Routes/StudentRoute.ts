@@ -38,10 +38,10 @@ const studentRoute = (producer: Producer) => {
   router.put("/ResetPassword", resetPassword);
   router.post("/SaveOrders", authtoken, saveOrders);
   router.post("/SaveQuickOrders", authtoken, saveQuickOrders);
-  router.put("/UpdateQuickOrders", updateQuickOrders);
-  router.get("/GetQuickOrdersByUserEmail", getQuickOrdersByUserId);
-  router.get("/GetOrdersByUserEmail", getOrdersByUserEmail);
-  router.delete("/DeleteQuickOrders", deleteQuickOrders);
+  router.put("/UpdateQuickOrders", authtoken, updateQuickOrders);
+  router.get("/GetQuickOrdersByUserEmail", authtoken, getQuickOrdersByUserId);
+  router.get("/GetOrdersByUserEmail", authtoken, getOrdersByUserEmail);
+  router.delete("/DeleteQuickOrders", authtoken, deleteQuickOrders);
   router.post("/FundWallet", authtoken, fundWallet);
   router.post("/ChargeWallet", authtoken, chargeWallet);
 
