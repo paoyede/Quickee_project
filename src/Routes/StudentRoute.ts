@@ -12,6 +12,8 @@ import {
   updateQuickOrders,
   verifyEmail,
   getOrdersByUserEmail,
+  fundWallet,
+  chargeWallet,
 } from "../Controller/StudentController";
 import { Request, Response, Router } from "express";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
@@ -40,6 +42,8 @@ const studentRoute = (producer: Producer) => {
   router.get("/GetQuickOrdersByUserEmail", getQuickOrdersByUserId);
   router.get("/GetOrdersByUserEmail", getOrdersByUserEmail);
   router.delete("/DeleteQuickOrders", deleteQuickOrders);
+  router.post("/FundWallet", authtoken, fundWallet);
+  router.post("/ChargeWallet", authtoken, chargeWallet);
 
   return router;
 };

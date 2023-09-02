@@ -48,3 +48,31 @@ interface Item {
   Price: number;
   Scoops: number;
 }
+
+export interface IWallet {
+  UserId: string;
+  FullName: string;
+  Balance: number;
+}
+
+export interface IDeposit {
+  UserId: string;
+  TrxRef: string;
+  Amount: number;
+  Status: string;
+}
+
+export interface IDebit {
+  UserId: string;
+  KitchenId: string;
+  OrderId: string;
+  TrxRef: string;
+  Amount: number;
+  Status: string;
+}
+
+export interface IFundWallet {
+  email: string;
+  amount: string;
+  reference?: string;
+}

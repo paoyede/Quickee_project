@@ -47,30 +47,41 @@ export const makepaystack_payment = async (req: Request, res: Response) => {
       .catch(async (error: any) => {
         // console.error("check: ", error.response.data);
         const response = error.response.data;
-        if (
+        var isPaid = await paystackVerifyPayment(reference);
+
+        const checkPaid =
+          isPaid.status === true && isPaid.data.status === "success";
+        const check =
           response.status === false &&
-          response.message === "Duplicate Transaction Reference"
-        ) {
-          if (fetchOrder.IsPaid === false) {
-            // Check if we've reached the maximum number of retries
-            const update = {
-              TrxRef: await cryptoGenTrxRef(7, aOrds, "TrxRef"),
-              UpdatedAt: currentTime,
-            };
-            await Update(aOrds, trxRef, reference, update);
-            if (retryCount < MAX_RETRIES) {
-              retryCount++;
-              console.log(`Retrying payment, attempt ${retryCount}`);
-              // Retry the payment after a short delay (e.g., 1 second)
-              saveOrderId = fetchOrder.OrderId;
-              setTimeout(() => makepaystack_payment(req, res), 1000);
-            } else {
-              return res.status(404).json("Maximum retries reached"); // Maximum retries reached
-            }
+          response.message === "Duplicate Transaction Reference";
+
+        if (check === true && checkPaid === false) {
+          // Check if we've reached the maximum number of retries
+          const update = {
+            TrxRef: await cryptoGenTrxRef(7, aOrds, "TrxRef"),
+            UpdatedAt: currentTime,
+          };
+          await Update(aOrds, trxRef, reference, update);
+          if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            console.log(`Retrying payment, attempt ${retryCount}`);
+            // Retry the payment after a short delay (e.g., 1 second)
+            saveOrderId = fetchOrder.OrderId;
+            setTimeout(() => makepaystack_payment(req, res), 1000);
           } else {
-            const success = Message(200, "Payment already made");
-            return res.status(404).json(success);
+            return res.status(404).json("Maximum retries reached"); // Maximum retries reached
           }
+        } else if (checkPaid === true) {
+          if (fetchOrder.IsPaid === false) {
+            var getOrder = await FirstOrDefault(aOrds, trxRef, reference);
+            await Update(aOrds, trxRef, reference, {
+              ...getOrder,
+              IsPaid: true,
+              UpdatedAt: currentTime,
+            });
+          }
+          const success = Message(200, "Payment already made");
+          return res.status(404).json(success);
         }
         // return res.status(404).json(error.response.data);
       });

@@ -62,7 +62,7 @@ export const RecipientsTable =
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const TransfersTable =
-  `CREATE TABLE "Transfers" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "Reference" VARCHAR,` +
+  `CREATE TABLE "Transfers" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "OrderId" UUID, "Reference" VARCHAR,` +
   `"RecipientCode" VARCHAR, "TransferCode" VARCHAR, "Status" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
@@ -77,3 +77,18 @@ export const AllOrders =
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const ForgotPassword = `CREATE TABLE "ForgotPassword" ("UserEmail" UUID PRIMARY KEY, "ForgotPin" VARCHAR(6)), "ExpiresAt" TIMESTAMP)`;
+
+export const WalletsTable =
+  `CREATE TABLE "Wallets" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID, "FullName" TEXT,` +
+  `"Balance" BIGINT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const DepositsTable =
+  `CREATE TABLE "Deposits" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID,` +
+  `"TrxRef" VARCHAR, "Amount" BIGINT, "Status" TEXT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const DebitsTable =
+  `CREATE TABLE "Debits" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID,` +
+  `"KitchenId" UUID, "OrderId" UUID, "TrxRef" VARCHAR, "Amount" BIGINT, "Status" TEXT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;

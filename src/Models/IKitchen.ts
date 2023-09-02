@@ -98,7 +98,7 @@ export interface IPaymentDto {
 
 export interface ITransferDto {
   source: string;
-  amount: string;
+  amount: number;
   reference: string;
   recipient: string;
   reason: string;
@@ -106,6 +106,7 @@ export interface ITransferDto {
 
 export interface ITransferDBDto {
   KitchenId: string;
+  OrderId: string;
   Reference: string;
   RecipientCode: string;
   TransferCode?: string;

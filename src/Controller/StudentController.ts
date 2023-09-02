@@ -1,6 +1,8 @@
 import { IEmailRequest } from "./../Models/IEmail";
 import {
   IAllUsersOrders,
+  IDeposit,
+  IFundWallet,
   IResetPassword,
   IVerifyEmail,
 } from "./../Models/IStudent";
@@ -40,6 +42,7 @@ import {
 import {
   CryptoGenSixDigitNum,
   RandGenSixDigitNum,
+  RandGenTrxRef,
   cryptoGenTrxRef,
 } from "../Utilities/RandomNumber";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
@@ -67,6 +70,12 @@ import {
   IGetOrdersDto,
   IGetStudentOrdersDto,
 } from "../Models/DTOs/IKitchenDto";
+import {
+  paystackPayment,
+  transferToKitchen,
+} from "../Services/Implementations/PayStack";
+import { IPayment } from "../Models/PayStack";
+import { ITransferDBDto, ITransferDto } from "../Models/IKitchen";
 
 const stdTab = "Student";
 const dbId = "Email";
@@ -78,8 +87,16 @@ const qordTab = "QuickOrders";
 const aqOrdTab = "AllQuickOrders";
 const forgot = "ForgotPassword";
 const kTab = "Kitchen";
+const kId = "KitchenId";
 const odbId = "OrderId";
 const uid = "UserId";
+const depTab = "Deposits";
+const rec = "Recipients";
+const trTab = "Transfers";
+const trRef = "Reference";
+const wTab = "Wallets";
+
+const currentTime = new Date();
 
 // const producer = new Producer();
 
@@ -666,6 +683,113 @@ export const deleteQuickOrders = async (
     const newResponse = DeletedResponse("QuickOrder", qoId);
     const success = Message(200, newResponse);
     return res.status(200).json(success);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const fundWallet = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const payload: IFundWallet = req.body;
+    var isUserExist = await FirstOrDefault(stdTab, dbId, payload.email);
+
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+    const reference = await cryptoGenTrxRef(8, depTab, "TrxRef");
+    const newPayload = {
+      email: payload.email,
+      reference: reference,
+      amount: parseInt(payload.amount) * 100,
+    };
+
+    paystackPayment(newPayload)
+      .then(async (response: any) => {
+        // console.log(response);
+
+        const deposit: IDeposit = {
+          Amount: parseInt(payload.amount),
+          Status: "pending",
+          TrxRef: reference,
+          UserId: isUserExist.Id,
+        };
+
+        await AddToDB(depTab, deposit);
+        return res
+          .status(200)
+          .json(Message(200, "Payment link received", response));
+      })
+      .catch(async (error: any) => {
+        // console.error("check: ", error.response.data);
+        const response = error?.response?.data;
+        return res.status(404).json(response);
+      });
+  } catch (error) {
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const chargeWallet = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const payload: IPayment = req.body;
+    var isUserExist = await FirstOrDefault(stdTab, dbId, payload.email);
+
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const orderId = payload.orderId;
+    var fetchOrder = await FirstOrDefault(aOrdTab, "OrderId", orderId);
+    if (fetchOrder === null) {
+      const error = Message(400, NotFoundResponse("Order"));
+      return res.status(400).json(error);
+    }
+
+    var fetchWallet = await FirstOrDefault(wTab, uid, fetchOrder.UserId);
+    var balance = parseInt(fetchWallet.Balance);
+    var ordAmt = parseInt(fetchOrder.TotalAmount);
+    // console.log(ordAmt, " ,", balance);
+    if (ordAmt > balance) {
+      const error = Message(400, "Not enough wallet credit");
+      return res.status(400).json(error);
+    }
+
+    if (fetchOrder.IsPaid === true) {
+      const error = Message(400, "Payment already made for this order");
+      return res.status(400).json(error);
+    }
+
+    var fetchRecipient = await FirstOrDefault(rec, kId, fetchOrder.KitchenId);
+    var kitchen = await FirstOrDefault(kTab, "Id", fetchOrder.KitchenId);
+    const ref = await RandGenTrxRef(17, trTab, trRef);
+
+    const transfer: ITransferDto = {
+      source: "balance",
+      amount: fetchOrder.TotalAmount * 100,
+      reference: ref,
+      recipient: fetchRecipient.RecipientCode,
+      reason: `Transfer order money to ${kitchen.KitchenName} kitchen`,
+    };
+
+    await transferToKitchen(transfer);
+
+    const transferdb: ITransferDBDto = {
+      KitchenId: fetchOrder.KitchenId,
+      OrderId: fetchOrder.OrderId,
+      RecipientCode: fetchRecipient.RecipientCode,
+      Reference: ref,
+      Status: "pending",
+    };
+
+    await AddToDB(trTab, transferdb);
+    return res.status(200).json(Message(200, "Processing payment"));
   } catch (error) {
     const err = Message(500, InternalError);
     return res.status(500).json(err);

@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNTM1NDg4LCJleHAiOjE2OTM1MzkwODh9.jSQc11y0tJcfvyplaQysOKMa8p8euc9pXsYdgT51ds8
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNjE2MDczLCJleHAiOjE2OTM2MTk2NzN9.pPTa7Qqr8PBMnGGsmwrrjHSq1zDMZXNaoY43FBHompk
 ###@atk1 = {{atk}}
 # @url = http://54.211.76.116
 # @url = http://192.168.186.240
@@ -90,23 +90,23 @@ Content-Type: application/json
   "Description": "Mix egusi and okro soup together",
   "Items": [
     {
-      "Name": "Jollof rice",
-      "Price": 300,
-      "Scoops": 1
+      "Name": "Wheat",
+      "Price": 700,
+      "Scoops": 2
     },
     {
-      "Name": "Fried rice",
+      "Name": "Egusi",
       "Price": 300,
       "Scoops": 1
     },
     {
       "Name": "Chicken",
-      "Price": 1200,
+      "Price": 800,
       "Scoops": 1
     },
     {
-      "Name": "Coke",
-      "Price": 500,
+      "Name": "Beef",
+      "Price": 1000,
       "Scoops": 1
     }
   ]
@@ -209,6 +209,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
+  "AccountNumber":363846484649,
   "ManagerPhone": 61982374629
 }
 ###
@@ -258,7 +259,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "orderId": "cf66da8a-87ea-4730-8f13-3ed6d62519a8",
+  "orderId": "e2165f27-bb3f-4d76-b67a-e9093bd13543",
   "email": "nifemiojinni22@gmail.com",
   "amount": 0
 }
@@ -314,6 +315,27 @@ Content-Type: application/json
 
 ###
 
+POST {{url}}/Student/FundWallet
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "email": "raphael.tunji@yahoo.com",
+  "amount": 7500
+}
+
+###
+
+POST {{url}}/Student/ChargeWallet
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "email": "raphael.tunji@yahoo.com",
+  "orderId": "72b16874-97b3-4129-bb3f-408b2e0b67d4"
+}
+
+###
 
 # {
 #   "status": true,

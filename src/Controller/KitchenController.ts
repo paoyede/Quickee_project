@@ -811,7 +811,7 @@ export const getNGBanks = async (req: Request, res: Response) => {
     const path = "/bank?currency=NGN";
     if (!isCached) {
       const response = await axioWith.get(path);
-      cache.set(country, response.data);
+      cache.set(country, response.data, 3600);
       return res.status(200).json(response.data);
     }
   } catch (error) {
