@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNjY1NjgzLCJleHAiOjE2OTM2NjkyODN9.7ljcBwDL2TQhSPre5ucwt1jXJ8Z1tFK5G8hWooSWbJo
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNzQ2NDQyLCJleHAiOjE2OTM3NTAwNDJ9.CRlqElCl7BgCUCtIInT5MqVPIz14pDCApDzpE9Sbcg8
 ###@atk1 = {{atk}}
 # @url = http://54.211.76.116
 # @url = http://192.168.186.240
@@ -31,7 +31,7 @@ Content-Type: application/json
 
 {
     "UserName": "Raphael.Olaiyapo",
-    "Password": "Aduragbemi1&&&"
+    "Password": "@$Nifemi567"
 }
 
 ###
@@ -46,15 +46,15 @@ Content-Type: application/json
 
 ###
 
-POST {{url}}/Student/ForgotPassword?email=nifemiojinni22@gmail.com
+POST {{url}}/Student/ForgotPassword?email=raphael.tunji@yahoo.com
 ###
 
 PUT {{url}}/Student/ResetPassword
 Content-Type: application/json
 
 {
-  "Email": "nifemiojinni22@gmail.com",
-  "OTP": "815730",
+  "Email": "raphael.tunji@yahoo.com",
+  "OTP": "110343",
   "NewPassword": "@$Nifemi567"
 }
 ###
@@ -74,7 +74,7 @@ Content-Type: application/json
     },
     {
       "Name": "Fried",
-      "Price": 300,
+      "Price": 600,
       "Scoops": 1
     },
     {
@@ -84,8 +84,8 @@ Content-Type: application/json
     },
     {
       "Name": "Beef",
-      "Price": 1000,
-      "Scoops": 1
+      "Price": 1500,
+      "Scoops": 4
     }
   ]
 }
@@ -276,7 +276,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "amount": 4000
+  "amount": 3500
 }
 
 ###
@@ -287,7 +287,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "orderId": "1ae1a994-42f2-4528-877a-4d19f9082369"
+  "orderId": "babbccd7-1fbf-4ed1-afc1-ef3de14f728a"
 }
 
 ###

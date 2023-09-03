@@ -6,12 +6,12 @@ import {
   deleteFoodMenu,
   deleteKitchen,
   deleteKitchenStaff,
-  // forgotPassword,
+  forgotPassword,
   getKitchenMenusById,
   getKitchenOrdersByEmail,
   getNGBanks,
   resendVerifyEmail,
-  // resetPassword,
+  resetPassword,
   signin,
   updateFoodMenu,
   updateKitchen,
@@ -41,10 +41,10 @@ const kitchenRoute = (producer: Producer) => {
   router.get("/ResendVerifyEmail", (req: Request, res: Response) =>
     resendVerifyEmail(producer, req, res)
   );
-  // router.post("/ForgotPassword", (req: Request, res: Response) =>
-  //   forgotPassword(producer, req, res)
-  // );
-  // router.put("/ResetPassword", resetPassword);
+  router.post("/ForgotPassword", (req: Request, res: Response) =>
+    forgotPassword(producer, req, res)
+  );
+  router.put("/ResetPassword", resetPassword);
   router.put("/Update", authtoken, updateKitchen);
   router.delete("/Delete", authtoken, deleteKitchen);
   router.post("/CreateMenu", authtoken, createFoodMenu);

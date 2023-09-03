@@ -496,107 +496,101 @@ export const resendVerifyEmail = async (
   }
 };
 
-// export const forgotPassword = async (
-//   producer: Producer,
-//   req: Request,
-//   res: Response
-// ) => {
-//   try {
-//     const email = req.query.email.toString();
-//     let userEmail, userName, isUserExist;
-//     isUserExist = await FirstOrDefault(kTab, dbId, email);
-//     if (isUserExist != null) {
-//       userEmail = isUserExist.KitchenEmail;
-//       userName = extractSurname(isUserExist.Manager);
-//     } else if (isUserExist === null) {
-//       isUserExist = await FirstOrDefault(kTab, dbid2, email);
-//       userEmail = isUserExist.AdminEmail;
-//       userName = extractSurname(isUserExist.AdminName);
-//     }
+export const forgotPassword = async (
+  producer: Producer,
+  req: Request,
+  res: Response
+) => {
+  try {
+    const email = req.query.email.toString();
+    var checkKitchen = await FirstOrDefault(kTab, dbId, email);
+    var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, email);
 
-//     if (isUserExist === null) {
-//       const error = Message(400, NotFoundResponse("User"));
-//       return res.status(400).json(error);
-//     }
+    if (checkKitchen === null && checkstaff === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
 
-//     const forgot = "ForgotPassword";
-//     const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
-//     const currentTime = new Date();
-//     currentTime.setMinutes(currentTime.getMinutes() + 5);
-//     const payload = {
-//       UserEmail: userEmail,
-//       ForgotPin: forgotDigit,
-//       ExpiresAt: currentTime,
-//     };
-//     var checkForgot = await FirstOrDefault(forgot, "UserEmail", userEmail);
+    const forgotDigit = await RandGenSixDigitNum(6, forgot, "ForgotPin");
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() + 5);
+    const payload = {
+      UserEmail: email,
+      ForgotPin: forgotDigit,
+      ExpiresAt: currentTime,
+    };
+    var checkForgot = await FirstOrDefault(forgot, "UserEmail", email);
 
-//     if (checkForgot === null) {
-//       await AddToDB(forgot, payload);
-//     } else {
-//       // delete payload.Id;
-//       await Update(forgot, "UserEmail", userEmail, payload);
-//     }
+    if (checkForgot === null) {
+      await AddToDB(forgot, payload);
+    } else {
+      // delete payload.Id;
+      await Update(forgot, "UserEmail", email, payload);
+    }
 
-//     const rabbitmqPayload: IEmailRequest = {
-//       EmailTemplate: "forgotpassword",
-//       Type: "Reset password",
-//       Name: userName,
-//       Payload: new Map([["Code", forgotDigit]]),
-//       Reciever: email,
-//     };
+    const lastName =
+      checkKitchen != null ? checkKitchen.ManagerLastName : checkstaff.LastName;
+    const rabbitmqPayload: IEmailRequest = {
+      EmailTemplate: "forgotpassword",
+      Type: "Reset password",
+      Name: lastName,
+      Payload: new Map([["Code", forgotDigit]]),
+      Reciever: email,
+    };
 
-//     // Convert the Map to an array of key-value pairs
-//     const payloadArray = Array.from(rabbitmqPayload.Payload);
-//     // Update the original object with the array
-//     rabbitmqPayload.Payload = payloadArray;
+    // Convert the Map to an array of key-value pairs
+    const payloadArray = Array.from(rabbitmqPayload.Payload);
+    // Update the original object with the array
+    rabbitmqPayload.Payload = payloadArray;
 
-//     const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
-//     producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
+    const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
+    producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
 
-//     const success = Message(200, ResetLinkSent);
-//     return res.status(200).json(success);
-//   } catch (error) {
-//     const errMessage = Message(500, InternalError);
-//     res.status(500).json(errMessage);
-//   }
-// };
+    const success = Message(200, ResetLinkSent);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    res.status(500).json(errMessage);
+  }
+};
 
-// export const resetPassword = async (req: Request, res: Response) => {
-//   try {
-//     const payload: IResetPassword = req.body;
-//     var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
-//     if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
-//       const error = Message(400, WrongOtp);
-//       return res.status(400).json(error);
-//     }
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const payload: IResetPassword = req.body;
+    var isOtpExist = await FirstOrDefault(forgot, "ForgotPin", payload.OTP);
+    if (isOtpExist === null || isOtpExist.UserEmail != payload.Email) {
+      const error = Message(400, WrongOtp);
+      return res.status(400).json(error);
+    }
 
-//     if (isOtpExist.ExpiresAt < new Date()) {
-//       const error = Message(400, ExpiredOTP);
-//       return res.status(400).json(error);
-//     }
+    if (isOtpExist.ExpiresAt < new Date()) {
+      const error = Message(400, ExpiredOTP);
+      return res.status(400).json(error);
+    }
 
-//     const userId = isOtpExist.UserEmail;
-//     const hash = await bcrypt.hash(payload.NewPassword, 10);
+    const userId = isOtpExist.UserEmail;
+    const hash = await bcrypt.hash(payload.NewPassword, 10);
 
-//     var isUserKitchen = await FirstOrDefault(kTab, dbId, userId);
-//     var isUserAdmin = await FirstOrDefault(kTab, dbid2, userId);
-//     let dbParam =
-//       isUserKitchen != null && isUserAdmin === null
-//         ? dbId
-//         : isUserKitchen === null && isUserAdmin != null
-//         ? dbid2
-//         : "";
+    var checkKitchen = await FirstOrDefault(kTab, dbId, userId);
+    var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, userId);
 
-//     const newPassword =
-//       dbParam === dbId ? { Password: hash } : { AdminPassword: hash };
-//     if (dbParam != "") await Update(kTab, dbParam, userId, newPassword);
-//     const success = Message(200, UpdateSuccess);
-//     return res.status(200).json(success);
-//   } catch (error) {
-//     const errMessage = Message(500, InternalError);
-//     res.status(500).json(errMessage);
-//   }
-// };
+    if (checkKitchen === null && checkstaff === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const dbTab = checkKitchen != null ? kTab : kstaffTab;
+    const dbParam = checkKitchen != null ? dbId : dbEmail;
+
+    const newPassword = { Password: hash };
+    await Update(dbTab, dbParam, userId, newPassword);
+    const success = Message(200, UpdateSuccess);
+    return res.status(200).json(success);
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    return res.status(500).json(errMessage);
+  }
+};
 
 export const updateKitchen = async (req: Request, res: Response) => {
   try {
