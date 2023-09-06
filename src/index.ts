@@ -42,6 +42,12 @@ if (cluster.isPrimary) {
   });
 } else {
   const app = express();
+  app.use(
+    cors({
+      credentials: true,
+      methods: ["GET", "POST", "DELETE", "PUT"],
+    })
+  );
   //initializing rabbitMQ for heavy processes
   const rabbitMQConfig = new RabbitMQConfig();
   rabbitMQConfig
@@ -52,12 +58,6 @@ if (cluster.isPrimary) {
         new Producer(rabbitMQConfig.connection);
       new Consumer(rabbitMQConfig.connection);
 
-      app.use(
-        cors({
-          credentials: true,
-          methods: ["GET", "POST", "DELETE", "PUT"],
-        })
-      );
       app.use(compression());
       app.use(cookieParser());
       app.use(bodyParser.json());
@@ -87,8 +87,8 @@ if (cluster.isPrimary) {
 
       // const ip = "127.0.0.1";
       //   const ip = "192.168.137.1";
-      // const port = 80;
-      const port = 3000;
+      const port = 80;
+      // const port = 3000;
 
       server.listen(
         port,
