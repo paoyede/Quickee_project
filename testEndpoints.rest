@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMjg2OGNmZmEtN2U0Ni00NzdhLTk3MjYtYmJlZGE0NjUwNTMwIiwiaWF0IjoxNjkzNzQ2NDQyLCJleHAiOjE2OTM3NTAwNDJ9.CRlqElCl7BgCUCtIInT5MqVPIz14pDCApDzpE9Sbcg8
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFsYWRlcmFwaHJlZG9AeWFob28uY29tIiwiVXNlcklkIjoiYmI5OGMyYzgtNjBlMS00NWQ4LTk3NzEtNzQyYzBkOGNiMDNiIiwiaWF0IjoxNjk0MDA1Njg3LCJleHAiOjE2OTQwMDkyODd9.BfissIuF6lk3uupI97XasEsuxj-0BL6xHrF4y8ad3Hw
 ###@atk1 = {{atk}}
 # @url = http://54.211.76.116
 # @url = http://192.168.186.240
@@ -16,13 +16,11 @@ POST {{url}}/Student/SignUp
 Content-Type: application/json
 
 {
-    "FirstName": "Nifemi",
-    "LastName": "Ojinni",
-    "Email": "nifemiojinni22@gmail.com",
-    "Password": "@$Nifemi567",
-    "IsVerifiedEmail": false,
-    "University": "Elizade University",
-    "UserName": ""
+    "FirstName": "Alade",
+    "LastName": "Aduragbemi",
+    "Email": "aladeraphredo@yahoo.com",
+    "Password": "Alade1&&&",
+    "University": "Elizade University"
 }
 ###
 
@@ -30,8 +28,8 @@ POST {{url}}/Student/SignIn
 Content-Type: application/json
 
 {
-    "UserName": "Raphael.Olaiyapo",
-    "Password": "@$Nifemi567"
+    "UserName": "Alade.Aduragbemi",
+    "Password": "Aduragbemi1&&&"
 }
 
 ###
@@ -40,42 +38,42 @@ PUT {{url}}/Student/VerifyEmail
 Content-Type: application/json
 
 {
-   "EmailOTP": "018810",
-   "Email": "nifemiojinni22@gmail.com"
+   "EmailOTP": "195111",
+   "Email": "aladeraphredo@yahoo.com"
 }
 
 ###
 
-POST {{url}}/Student/ForgotPassword?email=raphael.tunji@yahoo.com
+POST {{url}}/Student/ForgotPassword?email=aladeraphredo@yahoo.com
 ###
 
 PUT {{url}}/Student/ResetPassword
 Content-Type: application/json
 
 {
-  "Email": "raphael.tunji@yahoo.com",
-  "OTP": "110343",
-  "NewPassword": "@$Nifemi567"
+  "Email": "aladeraphredo@yahoo.com",
+  "OTP": "395656",
+  "NewPassword": "Aduragbemi1&&&"
 }
 ###
 
-POST {{url}}/Student/SaveOrders?Email=raphael.tunji@yahoo.com
+POST {{url}}/Student/SaveOrders?Email=aladeraphredo@yahoo.com
 Authorization: BEARER {{atk}}
 Content-Type: application/json
 
 {
   "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
-  "Description": "Mix egusi and okro soup together",
+  "Description": "Separate the rice",
   "Items": [
     {
       "Name": "Jollof",
-      "Price": 600,
-      "Scoops": 1
+      "Price": 900,
+      "Scoops": 9
     },
     {
       "Name": "Fried",
-      "Price": 600,
-      "Scoops": 1
+      "Price": 900,
+      "Scoops": 3
     },
     {
       "Name": "Chicken",
@@ -83,9 +81,9 @@ Content-Type: application/json
       "Scoops": 1
     },
     {
-      "Name": "Beef",
-      "Price": 1500,
-      "Scoops": 4
+      "Name": "Coke",
+      "Price": 300,
+      "Scoops": 1
     }
   ]
 }
@@ -95,16 +93,16 @@ POST {{url}}/Kitchen/Create
 Content-Type: application/json
 
 {
-  "KitchenName": "RaphaelFood",
-  "KitchenEmail": "aladeraphredo@yahoo.com",
+  "KitchenName": "ArchIntel",
+  "KitchenEmail": "raphael.tunji@yahoo.com",
   "ManagerFirstName": "George",
-  "ManagerLastName": "George",
-  "ManagerPhone": 23481035635487,
-  "ManagerEmail": "aladeraphredo@yahoo.com",
-  "Password": "Christi@567",
+  "ManagerLastName": "Timileyin",
+  "ManagerPhone": 2348102242355,
+  "ManagerEmail": "archraphr@gmail.com",
+  "Password": "Aduragbemi1&&&",
   "University": "Elizade University, Ondo",
   "AccountNumber": 3045313300,
-  "AccountName": "Raphael Food LTD",
+  "AccountName": "ArchIntel LTD",
   "BankCode": "011",
   "BankName": "CitiBank PLC"
 }
@@ -116,7 +114,7 @@ Content-Type: application/json
 
 {
   "Email": "raphael.tunji@yahoo.com",
-  "Password": "Alade1&&&"
+  "Password": "Aduragbemi1&&&"
 }
 
 ###
@@ -125,23 +123,14 @@ PUT {{url}}/Kitchen/VerifyEmail
 Content-Type: application/json
 
 {
-  "EmailOTP": "085119",
+  "EmailOTP": "696788",
   "Email": "raphael.tunji@yahoo.com"
 }
 
 
 ###
 
-GET {{url}}/Kitchen/ResendVerifyEmail?email=nifemiojinni22@gmail.com
-###
-
-PUT {{url}}/Kitchen/UpdateStaff?email=nifemiojinni22@gmail.com
-Authorization: Bearer {{atk}}
-Content-Type: application/json
-
-{
-  "Role": "admin"
-}
+GET {{url}}/Kitchen/ResendVerifyEmail?email=raphael.tunji@yahoo.com
 
 ###
 
@@ -158,74 +147,15 @@ Content-Type: application/json
 DELETE {{url}}/Kitchen/Delete?email=raphael.tunji@yahoo.com
 ###
 
-DELETE {{url}}/Kitchen/DeleteStaff?email=raphael.tunji@yahoo.com
-Authorization: Bearer {{atk}}
-
-###
-
-POST {{url}}/Kitchen/CreateMenu
-Authorization: Bearer {{atk}}
-Content-Type: application/json
-
-{
-  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
-  "FoodName": "Beef",
-  "Category": "Food",
-  "Class": "Meat",
-  "Price": 300,
-  "TotalQuantity": 350,
-  "Status": "available"
-}
-
-###
-
-PUT {{url}}/Kitchen/UpdateMenu?MenuId=755314fa-6216-4533-9aa5-6a82b1677a92
-Authorization: Bearer {{atk}}
-Content-Type: application/json
-
-{
-  "Price": 300,
-  "TotalQuantity": 50
-}
-###
-
-DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
-###
-
-GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=e4e73045-6827-488f-a833-a907bc5ea5f8
-Authorization: Bearer {{atk}}
-###
-
-POST {{url}}/Payment/MakePayment?Email=nifemiojinni22@gmail.com
-Authorization: Bearer {{atk}}
-Content-Type: application/json
-
-{
-  "orderId": "213c3f84-9088-4af9-a769-f51f8032513e",
-  "email": "nifemiojinni22@gmail.com",
-  "amount": 0
-}
-
-####
-
-GET {{url}}/Payment/VerifyPayment?Reference=WRwdgDV
-Authorization: Bearer {{atk}}
-#1v3ki9pgtp
-#####
-
-GET {{url}}/Kitchen/Fetch?food=rice
-
-###
-
 POST {{url}}/Kitchen/AddStaff
 Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "KitchenId": "e5454b54-983a-499c-89ff-57132260b1c2",
   "FirstName": "Raphael",
   "LastName": "Olaiyapo",
-  "Email": "raphael.tunji@yahoo.com",
+  "Email": "aladeraphredo@yahoo.com",
   "Password": "Alade1&&&",
   "Phone": 2348102242355,
   "University": "Elizade University",
@@ -241,6 +171,65 @@ Content-Type: application/json
   "FirstName": "Gorge",
   "LastName": "Alade"
 }
+
+###
+
+DELETE {{url}}/Kitchen/DeleteStaff?email=raphael.tunji@yahoo.com
+Authorization: Bearer {{atk}}
+
+###
+
+POST {{url}}/Kitchen/CreateMenu
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "FoodName": "Coke",
+  "Category": "Drinks",
+  "Class": "Minerals",
+  "Price": 300,
+  "TotalQuantity": 350,
+  "Status": "available"
+}
+
+###
+
+PUT {{url}}/Kitchen/UpdateMenu?MenuId=755314fa-6216-4533-9aa5-6a82b1677a92
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "TotalQuantity": 130,
+  "Status": "available"
+}
+###
+
+DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
+###
+
+GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=78bf3877-9b49-4527-9fa0-f2d065cd0e3f
+Authorization: Bearer {{atk}}
+###
+
+POST {{url}}/Payment/MakePayment?Email=nifemiojinni22@gmail.com
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "orderId": "b2b2b448-6f0c-413f-8959-04d59fc2d127",
+  "email": "nifemiojinni22@gmail.com",
+  "amount": 0
+}
+
+####
+
+GET {{url}}/Payment/VerifyPayment?Reference=WRwdgDV
+Authorization: Bearer {{atk}}
+#1v3ki9pgtp
+#####
+
+GET {{url}}/Kitchen/Fetch?food=rice
 
 ###
 
@@ -276,7 +265,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "amount": 3500
+  "amount": 1200
 }
 
 ###
@@ -287,10 +276,81 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "orderId": "babbccd7-1fbf-4ed1-afc1-ef3de14f728a"
+  "orderId": "b2b2b448-6f0c-413f-8959-04d59fc2d127"
 }
 
 ###
+
+###
+
+POST {{url}}/Kitchen/WriteReview
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "KitchenId":"78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "UserId":"2868cffa-7e46-477a-9726-bbeda4650530",
+  "Reviewer":"Raphael Olaiyapo",
+  "Review":"Laughter kitche is the best"
+}
+
+###
+
+GET {{url}}/Kitchen/GetReviewsByKitchenId?KitchenId=78bf3877-9b49-4527-9fa0-f2d065cd0e3f
+Authorization: Bearer {{atk}}
+
+###
+
+DELETE {{url}}/Kitchen/DeleteReviewById?ReviewId=875335d6-c2bd-4aa3-96fb-e6c818cb6537
+Authorization: Bearer {{atk}}
+
+###
+
+PUT {{url}}/Kitchen/UpdateReview
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "Id":"ad535e05-7d0c-4221-8efd-bba14c8ef00b",
+  "UserId":"2868cffa-7e46-477a-9726-bbeda4650530",
+  "Review":"Laughter kitchen is the best in this university",
+  "WhoLiked":["swift@gmail.com","kellos@hotmail.com","hello7@gmail.com","trending@yahoo.com"],
+  "WhoDisliked":["hello2@gmail.com","trend@yahoo.com"]
+}
+
+###
+
+###
+
+POST {{url}}/Student/RegisterDeviceToken
+Content-Type: application/json
+
+{
+  "FcmToken": "646fshfAzxQ",
+  "UserId": "218d5e3f-a894-47b9-8763-2d6ed69d3b47"
+}
+
+###
+
+POST {{url}}/Kitchen/SendNotification
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "UserId": "2868cffa-7e46-477a-9726-bbeda4650530",
+  "Title": "Order is ready",
+  "Message": "Your Order is ready for collection" 
+}
+
+###
+
+POST {{url}}/Kitchen/NotifiyAllUsers
+Authorization: Bearer {{atk}}
+
+
+###
+
 
 # {
 #   "status": true,

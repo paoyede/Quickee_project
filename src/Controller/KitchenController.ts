@@ -1,10 +1,19 @@
+import { getMessaging } from "firebase-admin/messaging";
 import {
+  IAllUserFCMTokens,
+  IFirebaseUserToken,
   IGetKitchenOrdersDto,
   IGetOrdersDto,
+  INotifyMessage,
+  IReview,
+  IUpdateReview,
   addKitStaffKeys,
+  fcmTokenkeys,
   noEditKitchenKeys,
+  reviewkeys,
   validateBankKeys,
 } from "./../Models/DTOs/IKitchenDto";
+
 import {
   CreateFoodMenu,
   IAddKitchenStaff,
@@ -29,6 +38,7 @@ import {
   DeletedResponse,
   AlreadyExistResponse,
   VerifyEmail,
+  pushNotifySent,
 } from "../Response/Responses";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
@@ -51,6 +61,7 @@ import NodeCache from "node-cache";
 import {
   CryptoGenSixDigitNum,
   RandGenSixDigitNum,
+  cryptoGenTrxRef,
 } from "../Utilities/RandomNumber";
 import { IEmailRequest } from "../Models/IEmail";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
@@ -74,6 +85,7 @@ import {
   validateBankAccount,
 } from "../Services/Implementations/PayStack";
 import {
+  Id,
   aOrdTab,
   dbEmail,
   dbId,
@@ -82,13 +94,20 @@ import {
   kTab,
   kmTab,
   kstaffTab,
+  notifyTab,
   ordTab,
   recTab,
+  revParam,
+  revTab,
   rtokTab,
+  sTab,
+  uid,
 } from "../Data/TableNames";
 
 const axioWith = axiosWithAuth(paystacksecret, "https://api.paystack.co");
 const cache = new NodeCache();
+
+const currentTime = new Date();
 
 export const createKitchen = async (
   producer: Producer,
@@ -691,32 +710,31 @@ export const createFoodMenu = async (
 export const updateFoodMenu = async (
   req: Request,
   res: Response
-): Promise<void> => {
+): Promise<any> => {
   try {
     const payload: UpdateFoodMenu = req.body;
     const menuId = req.query.MenuId.toString();
     var isFoodExist = await FirstOrDefault(kmTab, "Id", menuId);
     if (isFoodExist === null) {
       const error = Message(400, NotFoundResponse("Food"));
-      res.status(400).json(error);
-    } else {
-      const kitchenId = isFoodExist.KitchenId;
-      var isKitchenExist = await FirstOrDefault(kTab, "Id", kitchenId);
-
-      if (isKitchenExist === null) {
-        const error = Message(400, NotFoundResponse("Kitchen"));
-        res.status(400).json(error);
-      } else {
-        // producer.publishMessage("This is a test");
-        const response = await Update(kmTab, "Id", menuId, payload);
-        const success = Message(200, UpdateSuccess, response);
-        res.status(200).json(success);
-      }
+      return res.status(400).json(error);
     }
+
+    const kitchenId = isFoodExist.KitchenId;
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kitchenId);
+    if (isKitchenExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+    // producer.publishMessage("This is a test");
+    const updatePayload = { ...payload, UpdatedAt: currentTime };
+    const response = await Update(kmTab, "Id", menuId, updatePayload);
+    const success = Message(200, UpdateSuccess, response);
+    return res.status(200).json(success);
   } catch (error) {
     console.log(error);
     const err = Message(500, InternalError);
-    res.status(500).json(err);
+    return res.status(500).json(err);
   }
 };
 
@@ -826,6 +844,221 @@ const CheckCacheResource = (cacheKey: string, res: Response): boolean => {
     return true;
   }
   return false;
+};
+
+export const writeReview = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const checkPayload: IReview = req.body;
+
+    if (!isValidPayload(checkPayload, reviewkeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(kTab, Id, checkPayload.KitchenId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(sTab, Id, checkPayload.UserId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const rev = checkPayload.Review;
+    var isUserExist = await FirstOrDefault(revTab, revParam, rev);
+    if (isUserExist != null) {
+      const error = Message(400, AlreadyExistResponse("This review"));
+      return res.status(400).json(error);
+    }
+
+    checkPayload.Tag = await cryptoGenTrxRef(7, revTab, "Tag");
+    checkPayload.AgreeCount = 0;
+    checkPayload.DisagreeCount = 0;
+    checkPayload.WhoDisliked = [""];
+    checkPayload.WhoLiked = [""];
+
+    // producer.publishMessage("This is a test");
+    const response = await AddToDB(revTab, checkPayload);
+    const success = Message(200, CreateSuccess, response);
+    return res.status(200).json(success);
+
+    // console.log(payload);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    res.status(500).json(err);
+  }
+};
+
+export const getReviews = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const kitId = req.query.KitchenId.toString();
+
+    var reviews = await GetAllById(revTab, dbkId, kitId);
+
+    const success = Message(200, FetchedSuccess, reviews);
+    return res.status(200).json(success);
+
+    // console.log(payload);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    res.status(500).json(err);
+  }
+};
+
+export const deleteReview = async (req: Request, res: Response) => {
+  try {
+    const revId = req.query.ReviewId.toString();
+    const isReviewExist = await FirstOrDefault(revTab, "Id", revId);
+
+    if (isReviewExist == null) {
+      const error = Message(400, NotFoundResponse("Review"));
+      return res.status(400).json(error);
+    }
+
+    await Remove(revTab, "Id", revId);
+    return res.status(200).json(DeletedResponse("Review", revId));
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    return res.status(500).json(errMessage);
+  }
+};
+
+export const updateReview = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const payload: IUpdateReview = req.body;
+
+    const isReviewExist = await FirstOrDefault(revTab, "Id", payload.Id);
+    if (isReviewExist === null) {
+      const error = Message(400, NotFoundResponse("Review"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(sTab, Id, payload.UserId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    // compareAndUpdateProperties(payload, isReviewExist);
+    const updatePayload = {
+      UpdatedAt: currentTime,
+      AgreeCount: payload.WhoLiked.length,
+      DisagreeCount: payload.WhoDisliked.length,
+      WhoLiked: payload.WhoLiked,
+      WhoDisliked: payload.WhoDisliked,
+      Review: payload.Review,
+    };
+    const response = await Update(revTab, "Id", payload.Id, updatePayload);
+    const success = Message(200, UpdateSuccess, response);
+    return res.status(200).json(success);
+  } catch (error) {
+    console.log(error);
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const sendNotification = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    //https://firebase.google.com/docs/cloud-messaging/send-message
+    const payload: INotifyMessage = req.body;
+
+    var checkNotify = await FirstOrDefault(notifyTab, uid, payload.UserId);
+    if (checkNotify === null) {
+      const sms =
+        "This user has not enabled his/her device for receiving notification";
+      const success = Message(200, sms);
+      return res.status(400).json(success);
+    }
+    const message = {
+      notification: {
+        title: payload.Title,
+        body: payload.Message,
+      },
+      token: checkNotify.FcmToken,
+    };
+
+    // Send a message to the device corresponding to the provided
+    // registration token.
+    getMessaging()
+      .send(message)
+      .then((response) => {
+        // Response is a message ID string.
+        console.log("Successfully sent message:", response);
+        const success = Message(200, pushNotifySent);
+        return res.status(200).json(success);
+      })
+      .catch((error) => {
+        console.log("Error sending message:", error);
+      });
+  } catch (error) {
+    // console.log(error);
+    const err = Message(500, InternalError, error);
+    return res.status(500).json(err);
+  }
+};
+
+export const notifyToAllUsers = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    //https://firebase.google.com/docs/cloud-messaging/send-message
+    const fetchTokens = await GetAll(notifyTab);
+    const allTokens = fetchTokens
+      .map((item: any) => item.FcmToken)
+      .filter(Boolean);
+
+    // These registration tokens come from the client FCM SDKs
+    const message = {
+      data: { score: "850", time: "2:45" },
+      tokens: allTokens,
+    };
+
+    getMessaging()
+      .sendEachForMulticast(message)
+      .then((response) => {
+        if (response.failureCount > 0) {
+          const failedTokens: any = [];
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              failedTokens.push(allTokens[idx]);
+            }
+          });
+          console.log("List of tokens that caused failures: " + failedTokens);
+        }
+        if (response.successCount > 0) {
+          const success = Message(
+            200,
+            pushNotifySent + ` to ${response.successCount} users`
+          );
+          return res.status(200).json(success);
+        }
+      });
+  } catch (error) {
+    // console.log(error);
+    const err = Message(500, InternalError, error);
+    return res.status(500).json(err);
+  }
 };
 
 const extractSurname = (fullName: string) => {

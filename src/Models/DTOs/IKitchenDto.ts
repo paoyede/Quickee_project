@@ -138,3 +138,51 @@ export interface IGetItemsDto {
   CreatedAt: string;
   UpdatedAt: string;
 }
+
+export interface IReview {
+  KitchenId: string;
+  UserId: string;
+  Reviewer: string;
+  Review: string;
+  Tag: string;
+  AgreeCount: number;
+  DisagreeCount: number;
+  WhoLiked: string[];
+  WhoDisliked: string[];
+}
+
+export interface IUpdateReview {
+  Id: string;
+  UserId: string;
+  Review: string;
+  WhoLiked: string[];
+  WhoDisliked: string[];
+}
+
+export const updateReviewkeys = [
+  "Id",
+  "UserId",
+  "Review",
+  "WhoLiked",
+  "WhoDisliked",
+];
+
+export const reviewkeys = ["KitchenId", "UserId", "Reviewer", "Review"];
+
+export interface IFirebaseUserToken {
+  FcmToken: string;
+  UserId: string;
+}
+
+export interface INotifyMessage {
+  KitchenId: string;
+  UserId: string;
+  Title: string;
+  Message: string;
+}
+
+export const fcmTokenkeys = ["FcmToken", "UserId"];
+
+export interface IAllUserFCMTokens {
+  FcmTokens: string[];
+}

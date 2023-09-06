@@ -37,8 +37,8 @@ export const MenuTable =
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const ReviewTable =
-  `CREATE TABLE "Review" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "Reviewer" TEXT, "Review" TEXT,` +
-  `"AgreeCount" BIGINT, "DisagreeCount" BIGINT,` +
+  `CREATE TABLE "Review" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenId" UUID, "UserId" UUID, "Reviewer" TEXT, "Review" TEXT,` +
+  `"Tag" TEXT, "AgreeCount" BIGINT, "DisagreeCount" BIGINT,"WhoLiked" VARCHAR[], "WhoDisliked" VARCHAR[],` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const AllQuickOrders =
@@ -91,4 +91,14 @@ export const DepositsTable =
 export const DebitsTable =
   `CREATE TABLE "Debits" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID,` +
   `"KitchenId" UUID, "OrderId" UUID, "TrxRef" VARCHAR, "Amount" BIGINT, "Status" TEXT,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const NotificationsTable =
+  `CREATE TABLE "Notifications" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID,` +
+  `"FcmToken" VARCHAR,` +
+  `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+
+export const SentMessagesTable =
+  `CREATE TABLE "SentMessages" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID,` +
+  `"Message" TEXT, "Sender" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;

@@ -68,8 +68,10 @@ import {
   isValidPayload,
 } from "../Utilities/Validations";
 import {
+  IFirebaseUserToken,
   IGetOrdersDto,
   IGetStudentOrdersDto,
+  fcmTokenkeys,
 } from "../Models/DTOs/IKitchenDto";
 import {
   paystackPayment,
@@ -78,6 +80,7 @@ import {
 import { IPayment } from "../Models/PayStack";
 import { ITransferDBDto, ITransferDto } from "../Models/IKitchen";
 import {
+  Id,
   aOrdTab,
   aqOrdTab,
   dbEmail,
@@ -87,6 +90,7 @@ import {
   forgot,
   kTab,
   kmTab,
+  notifyTab,
   ordTab,
   orderId,
   qordTab,
@@ -437,9 +441,14 @@ export const saveOrders = async (req: Request, res: Response): Promise<any> => {
       const eOrder = payload.Items[index];
       const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
       const fetchMenu = await QueryParamsFirstOrDefault(kmTab, queryParams);
-      const qty = fetchMenu.TotalQuantity;
+      const qty = parseInt(fetchMenu.TotalQuantity);
       if (qty < eOrder.Scoops && qty != 0) {
         const msg = `Not enough scoops for ${eOrder.Name}, we have ${qty} scoops left`;
+        const error = Message(400, msg);
+        return res.status(400).json(error);
+      } else if (qty < eOrder.Scoops && qty === 0) {
+        await Update(kmTab, "Id", fetchMenu.Id, { Status: "finished" });
+        const msg = `${eOrder.Name} has finished, please check back later`;
         const error = Message(400, msg);
         return res.status(400).json(error);
       }
@@ -667,7 +676,7 @@ export const updateQuickOrders = async (
     const getAllQorders = await GetAllById(qordTab, orderId, ordId);
     const allItems: UpdateItemDto[] = getAllQorders;
     compareAndUpdateProperties(inItems, allItems);
-    console.log(allItems);
+    // console.log(allItems);
     for (let index = 0; index < allItems.length; index++) {
       const eachOrder = allItems[index];
       eachOrder.OrderId = saveToAllorders.OrderId;
@@ -816,6 +825,57 @@ export const chargeWallet = async (
   } catch (error) {
     const err = Message(500, InternalError);
     return res.status(500).json(err);
+  }
+};
+
+export const registerDeviceToken = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const checkPayload: IFirebaseUserToken = req.body;
+
+    if (!isValidPayload(checkPayload, fcmTokenkeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(sTab, Id, checkPayload.UserId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    var checkNotify = await FirstOrDefault(notifyTab, uid, checkPayload.UserId);
+    if (checkNotify != null) {
+      if (checkNotify.FcmToken === checkPayload.FcmToken) {
+        const success = Message(200, AlreadyExistResponse("FcmToken"));
+        return res.status(200).json(success);
+      } else if (checkNotify.FcmToken != checkPayload.FcmToken) {
+        const response = await Update(notifyTab, uid, checkPayload.UserId, {
+          FcmToken: checkPayload.FcmToken,
+          UpdatedAt: currentTime,
+        });
+        const success = Message(200, CreateSuccess, response);
+        return res.status(200).json(success);
+      }
+    }
+
+    const response = await AddToDB(notifyTab, checkPayload);
+    const success = Message(200, CreateSuccess, response);
+    return res.status(200).json(success);
+
+    // console.log(payload);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    res.status(500).json(err);
   }
 };
 

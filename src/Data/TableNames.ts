@@ -23,3 +23,7 @@ export const Id = "Id";
 export const qordTab = "QuickOrders";
 export const aqOrdTab = "AllQuickOrders";
 export const dbid2 = "UserName";
+export const revTab = "Review";
+export const revParam = "Review";
+export const notifyTab = "Notifications";
+export const sentMessageTab = "SentMessages";

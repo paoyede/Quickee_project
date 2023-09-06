@@ -13,6 +13,7 @@ import paymentRoute from "./Routes/PaymentRoute";
 import Producer from "./Services/Implementations/MessageBroker/Producer";
 import Consumer from "./Services/Implementations/MessageBroker/Consumer";
 import RabbitMQConfig from "./Services/Implementations/MessageBroker/Connection";
+import { initializeApp, applicationDefault } from "firebase-admin/app";
 
 const numCPUs = cpus().length;
 
@@ -41,8 +42,8 @@ if (cluster.isPrimary) {
   });
 } else {
   const app = express();
+  //initializing rabbitMQ for heavy processes
   const rabbitMQConfig = new RabbitMQConfig();
-
   rabbitMQConfig
     .initialize()
     .then(() => {
@@ -51,10 +52,21 @@ if (cluster.isPrimary) {
         new Producer(rabbitMQConfig.connection);
       new Consumer(rabbitMQConfig.connection);
 
-      app.use(cors({ credentials: true }));
+      app.use(
+        cors({
+          credentials: true,
+          methods: ["GET", "POST", "DELETE", "PUT"],
+        })
+      );
       app.use(compression());
       app.use(cookieParser());
       app.use(bodyParser.json());
+      //initializing firebase for push notification
+      // initializeApp({
+      //   credential: applicationDefault(),
+      //   projectId: "potion-for-creators",
+      // });
+
       app.use("/DbOps", DbOpsRoute);
       app.use("/Student", studentRoute(producer));
       app.use("/Kitchen", kitchenRoute(producer));
