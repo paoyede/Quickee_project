@@ -1,10 +1,10 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFsYWRlcmFwaHJlZG9AeWFob28uY29tIiwiVXNlcklkIjoiYmI5OGMyYzgtNjBlMS00NWQ4LTk3NzEtNzQyYzBkOGNiMDNiIiwiaWF0IjoxNjk0MDA1Njg3LCJleHAiOjE2OTQwMDkyODd9.BfissIuF6lk3uupI97XasEsuxj-0BL6xHrF4y8ad3Hw
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiYmNiMzhiNzItN2UzYi00YzkzLWJjYjAtOWNhNmUxOWQwZTFmIiwiaWF0IjoxNjk0MDMzNDExLCJleHAiOjE2OTQwMzcwMTF9.5mqLb5pqLzUcgvcq709LkwTfwYu-ThLbIIkxuoFrzTc
 ###@atk1 = {{atk}}
-# @url = http://54.211.76.116
+@url = http://44.218.221.120
 # @url = http://192.168.186.240
-@url = http://127.0.0.1:3000
+# @url = http://127.0.0.1:3000
 
 ###
 # GET {{url}}/DbOps/createdb?dbName=student
@@ -18,7 +18,7 @@ Content-Type: application/json
 {
     "FirstName": "Alade",
     "LastName": "Aduragbemi",
-    "Email": "aladeraphredo@yahoo.com",
+    "Email": "raphael.tunji@yahoo.com",
     "Password": "Alade1&&&",
     "University": "Elizade University"
 }
@@ -38,37 +38,37 @@ PUT {{url}}/Student/VerifyEmail
 Content-Type: application/json
 
 {
-   "EmailOTP": "195111",
-   "Email": "aladeraphredo@yahoo.com"
+   "EmailOTP": "937378",
+   "Email": "raphael.tunji@yahoo.com"
 }
 
 ###
 
-POST {{url}}/Student/ForgotPassword?email=aladeraphredo@yahoo.com
+POST {{url}}/Student/ForgotPassword?email=raphael.tunji@yahoo.com
 ###
 
 PUT {{url}}/Student/ResetPassword
 Content-Type: application/json
 
 {
-  "Email": "aladeraphredo@yahoo.com",
-  "OTP": "395656",
+  "Email": "raphael.tunji@yahoo.com",
+  "OTP": "584904",
   "NewPassword": "Aduragbemi1&&&"
 }
 ###
 
-POST {{url}}/Student/SaveOrders?Email=aladeraphredo@yahoo.com
+POST {{url}}/Student/SaveOrders?Email=raphael.tunji@yahoo.com
 Authorization: BEARER {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
+  "KitchenId": "a686c2c8-982f-4042-b46d-262926da13b3",
   "Description": "Separate the rice",
   "Items": [
     {
       "Name": "Jollof",
       "Price": 900,
-      "Scoops": 9
+      "Scoops": 3
     },
     {
       "Name": "Fried",
@@ -94,7 +94,7 @@ Content-Type: application/json
 
 {
   "KitchenName": "ArchIntel",
-  "KitchenEmail": "raphael.tunji@yahoo.com",
+  "KitchenEmail": "aladeraphredo@yahoo.com",
   "ManagerFirstName": "George",
   "ManagerLastName": "Timileyin",
   "ManagerPhone": 2348102242355,
@@ -184,12 +184,12 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "78bf3877-9b49-4527-9fa0-f2d065cd0e3f",
-  "FoodName": "Coke",
-  "Category": "Drinks",
-  "Class": "Minerals",
-  "Price": 300,
-  "TotalQuantity": 350,
+  "KitchenId": "a686c2c8-982f-4042-b46d-262926da13b3",
+  "FoodName": "Fried",
+  "Category": "Food",
+  "Class": "Rice",
+  "Price": 400,
+  "TotalQuantity": 200,
   "Status": "available"
 }
 
@@ -217,8 +217,8 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "orderId": "b2b2b448-6f0c-413f-8959-04d59fc2d127",
-  "email": "nifemiojinni22@gmail.com",
+  "orderId": "fd13922e-badc-4f4a-8995-3c310471a74a",
+  "email": "raphael.tunji@yahoo.com",
   "amount": 0
 }
 
