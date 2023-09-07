@@ -101,6 +101,7 @@ import {
   revTab,
   rtokTab,
   sTab,
+  sentMessageTab,
   uid,
 } from "../Data/TableNames";
 
@@ -989,6 +990,12 @@ export const sendNotification = async (
       const success = Message(200, sms);
       return res.status(400).json(success);
     }
+
+    var isUserExist = await FirstOrDefault(kTab, Id, payload.KitchenId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
     const message = {
       notification: {
         title: payload.Title,
@@ -1001,8 +1008,15 @@ export const sendNotification = async (
     // registration token.
     getMessaging()
       .send(message)
-      .then((response) => {
+      .then(async (response) => {
         // Response is a message ID string.
+        const data = {
+          UserId: payload.UserId,
+          Title: payload.Title,
+          Message: payload.Message,
+          Sender: isUserExist.KitchenName,
+        };
+        await AddToDB(sentMessageTab, data);
         console.log("Successfully sent message:", response);
         const success = Message(200, pushNotifySent);
         return res.status(200).json(success);
@@ -1028,29 +1042,46 @@ export const notifyToAllUsers = async (
       .map((item: any) => item.FcmToken)
       .filter(Boolean);
 
+    const payload: INotifyMessage = req.body;
+
     // These registration tokens come from the client FCM SDKs
     const message = {
-      data: { score: "850", time: "2:45" },
+      notification: {
+        title: payload.Title,
+        body: payload.Message,
+      },
       tokens: allTokens,
     };
+
+    var isUserExist = await FirstOrDefault(kTab, Id, payload.KitchenId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
 
     getMessaging()
       .sendEachForMulticast(message)
       .then((response) => {
         if (response.failureCount > 0) {
           const failedTokens: any = [];
-          response.responses.forEach((resp, idx) => {
+          response.responses.forEach(async (resp, idx) => {
             if (!resp.success) {
               failedTokens.push(allTokens[idx]);
+            } else if (resp.success) {
+              const data = {
+                UserId: payload.UserId,
+                Title: payload.Title,
+                Message: payload.Message,
+                Sender: isUserExist.KitchenName,
+              };
+              await AddToDB(sentMessageTab, data);
             }
           });
           console.log("List of tokens that caused failures: " + failedTokens);
         }
         if (response.successCount > 0) {
-          const success = Message(
-            200,
-            pushNotifySent + ` to ${response.successCount} users`
-          );
+          const resp = pushNotifySent + ` to ${response.successCount} users`;
+          const success = Message(200, resp);
           return res.status(200).json(success);
         }
       });

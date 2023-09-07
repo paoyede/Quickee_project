@@ -100,5 +100,5 @@ export const NotificationsTable =
 
 export const SentMessagesTable =
   `CREATE TABLE "SentMessages" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "UserId" UUID,` +
-  `"Message" TEXT, "Sender" TEXT,` +
+  `"Title" TEXT, "Message" TEXT, "Sender" TEXT,` +
   `"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
