@@ -247,7 +247,7 @@ export const forgotPassword = async (
   res: Response
 ) => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
@@ -373,7 +373,7 @@ export const resendVerifyEmail = async (
   res: Response
 ): Promise<any> => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     // console.log("Email: ", email);
     var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {

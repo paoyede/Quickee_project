@@ -1,10 +1,10 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFsYWRlcmFwaHJlZG9AeWFob28uY29tIiwiVXNlcklkIjoiZjA4MDdiYmYtMWVmOS00NzE1LWFiODAtZWY3YTI0ZDJmOTAzIiwiaWF0IjoxNjk0MTU5MTg1LCJleHAiOjE2OTQxNjI3ODV9.dAjpC8jNb5vYdfR04_VxZQq68s1edT9JlDxXb6neTi0
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMGIyMjNjY2EtZWQ0Zi00NjdhLWJhZDMtOWFiYmZjMzUxYTkwIiwiaWF0IjoxNjk0MTYyOTA4LCJleHAiOjE2OTQxNjY1MDh9.Y38EY2z7SffuvKu8DdZ3H4T2JyvJxtni6hYEKIvJYn8
 ###@atk1 = {{atk}}
-# @url = http://52.14.36.26:85
+@url = http://52.14.36.26:85
 # @url = http://192.168.186.240
-@url = http://127.0.0.1:3000
+# @url = http://127.0.0.1:3000
 
 ###
 # GET {{url}}/DbOps/createdb?dbName=student
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
     "UserName": "Alade.Aduragbemi",
-    "Password": "Aduragbemi1&&&"
+    "Password": "Alade1&&&"
 }
 
 ###
@@ -38,7 +38,7 @@ PUT {{url}}/Student/VerifyEmail
 Content-Type: application/json
 
 {
-   "EmailOTP": "516627",
+   "EmailOTP": "965485",
    "Email": "raphael.tunji@yahoo.com"
 }
 
