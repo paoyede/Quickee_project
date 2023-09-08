@@ -6,7 +6,6 @@ import {
   deleteFoodMenu,
   deleteKitchen,
   deleteKitchenStaff,
-  deleteReview,
   forgotPassword,
   getKitchenMenusById,
   getKitchenOrdersByEmail,
@@ -20,10 +19,8 @@ import {
   updateFoodMenu,
   updateKitchen,
   updateKitchenStaff,
-  updateReview,
   validateKitchenBank,
   verifyEmail,
-  writeReview,
 } from "../Controller/KitchenController";
 import { Request, Response, Router } from "express";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
@@ -61,10 +58,7 @@ const kitchenRoute = (producer: Producer) => {
   router.get("/GetBanks", getNGBanks);
   router.get("/ValidateKitchenBank", validateKitchenBank);
   router.post("/VerifyWebhook", verifyWebhook);
-  router.post("/WriteReview", authtoken, writeReview);
   router.get("/GetReviewsByKitchenId", authtoken, getReviews);
-  router.delete("/DeleteReviewById", authtoken, deleteReview);
-  router.put("/UpdateReview", authtoken, updateReview);
   router.post("/SendNotification", authtoken, sendNotification);
   router.post("/NotifiyAllUsers", authtoken, notifyToAllUsers);
 

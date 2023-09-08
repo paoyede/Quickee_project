@@ -30,7 +30,7 @@ import {
   FirstOrDefault,
   GetAll,
   GetAllById,
-  QueryParamsFirstOrDefault,
+  FirstOrDefaultQueryable,
   Remove,
   Update,
 } from "../Infrastructure/Repository";
@@ -71,7 +71,10 @@ import {
   IFirebaseUserToken,
   IGetOrdersDto,
   IGetStudentOrdersDto,
+  IReview,
+  IUpdateReview,
   fcmTokenkeys,
+  reviewkeys,
 } from "../Models/DTOs/IKitchenDto";
 import {
   paystackPayment,
@@ -95,6 +98,8 @@ import {
   orderId,
   qordTab,
   recTab,
+  revParam,
+  revTab,
   rtokTab,
   sTab,
   trRef,
@@ -369,7 +374,7 @@ export const resendVerifyEmail = async (
 ): Promise<any> => {
   try {
     const email = req.query.email.toString();
-    console.log("Email: ", email);
+    // console.log("Email: ", email);
     var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("User"));
@@ -399,7 +404,7 @@ export const resendVerifyEmail = async (
     const success = Message(200, VerifyEmail);
     return res.status(200).json(success);
   } catch (error) {
-    const err = Message(500, InternalError);
+    const err = Message(500, InternalError, error);
     return res.status(500).json(err);
   }
 };
@@ -440,14 +445,14 @@ export const saveOrders = async (req: Request, res: Response): Promise<any> => {
     for (let index = 0; index < payload.Items.length; index++) {
       const eOrder = payload.Items[index];
       const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
-      const fetchMenu = await QueryParamsFirstOrDefault(kmTab, queryParams);
-      const qty = parseInt(fetchMenu.TotalQuantity);
+      const getMenu = await FirstOrDefaultQueryable(kmTab, queryParams, "and");
+      const qty = parseInt(getMenu.TotalQuantity);
       if (qty < eOrder.Scoops && qty != 0) {
         const msg = `Not enough scoops for ${eOrder.Name}, we have ${qty} scoops left`;
         const error = Message(400, msg);
         return res.status(400).json(error);
       } else if (qty < eOrder.Scoops && qty === 0) {
-        await Update(kmTab, "Id", fetchMenu.Id, { Status: "finished" });
+        await Update(kmTab, "Id", getMenu.Id, { Status: "finished" });
         const msg = `${eOrder.Name} has finished, please check back later`;
         const error = Message(400, msg);
         return res.status(400).json(error);
@@ -474,7 +479,7 @@ export const saveOrders = async (req: Request, res: Response): Promise<any> => {
     const success = Message(200, CreateSuccess, newResponse);
     return res.status(200).json(success);
   } catch (error) {
-    const err = Message(500, InternalError);
+    const err = Message(500, InternalError, error);
     return res.status(500).json(err);
   }
 };
@@ -596,15 +601,23 @@ export const getQuickOrdersByUserId = async (
     const udbId = isUserExist.Id;
     const aQords = await GetAllById(aqOrdTab, uid, udbId);
     let newAQorders: IUpdateQuickOrderDto[] = [];
-    for (let index = 0; index < aQords.length; index++) {
-      let eOrders = aQords[index];
-      const oid = eOrders.OrderId;
-      delete eOrders.CreatedAt;
-      delete eOrders.UpdatedAt;
-      const aqOrders = await GetAllById(qordTab, orderId, oid);
-      const nobj: IUpdateQuickOrderDto = { ...eOrders };
-      nobj.Items = aqOrders;
-      newAQorders.push(nobj);
+    if (aQords != null) {
+      for (let index = 0; index < aQords.length; index++) {
+        let eOrders = aQords[index];
+        const oid = eOrders.OrderId;
+        // delete eOrders.CreatedAt;
+        // delete eOrders.UpdatedAt;
+        const aqOrders = await GetAllById(qordTab, orderId, oid);
+        for (let index = 0; index < aqOrders.length; index++) {
+          const element = aqOrders[index];
+          delete element.OrderId;
+          delete element.CreatedAt;
+          delete element.UpdatedAt;
+        }
+        const nobj: IUpdateQuickOrderDto = { ...eOrders };
+        nobj.Items = aqOrders;
+        newAQorders.push(nobj);
+      }
     }
 
     const success = Message(200, FetchedSuccess, newAQorders);
@@ -786,6 +799,10 @@ export const chargeWallet = async (
     }
 
     var fetchWallet = await FirstOrDefault(wTab, uid, fetchOrder.UserId);
+    if (fetchWallet === null) {
+      const error = Message(400, "No wallet found for this user");
+      return res.status(400).json(error);
+    }
     var balance = parseInt(fetchWallet.Balance);
     var ordAmt = parseInt(fetchOrder.TotalAmount);
     // console.log(ordAmt, " ,", balance);
@@ -876,6 +893,118 @@ export const registerDeviceToken = async (
   } catch (error) {
     const err = Message(500, InternalError);
     res.status(500).json(err);
+  }
+};
+
+export const writeReview = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const checkPayload: IReview = req.body;
+
+    if (!isValidPayload(checkPayload, reviewkeys)) {
+      const error = Message(400, "Invalid payload");
+      return res.status(400).json(error);
+    }
+
+    const emptyFields = Validation(checkPayload);
+    if (emptyFields.length > 0) {
+      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
+      const error = Message(400, errorMessage);
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(kTab, Id, checkPayload.KitchenId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(sTab, Id, checkPayload.UserId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const rev = checkPayload.Review;
+    var isUserExist = await FirstOrDefault(revTab, revParam, rev);
+    if (isUserExist != null) {
+      const error = Message(400, AlreadyExistResponse("This review"));
+      return res.status(400).json(error);
+    }
+
+    checkPayload.Tag = await cryptoGenTrxRef(7, revTab, "Tag");
+    checkPayload.AgreeCount = 0;
+    checkPayload.DisagreeCount = 0;
+    checkPayload.WhoDisliked = [""];
+    checkPayload.WhoLiked = [""];
+
+    // producer.publishMessage("This is a test");
+    const response = await AddToDB(revTab, checkPayload);
+    const success = Message(200, CreateSuccess, response);
+    return res.status(200).json(success);
+
+    // console.log(payload);
+  } catch (error) {
+    const err = Message(500, InternalError);
+    res.status(500).json(err);
+  }
+};
+
+export const deleteReview = async (req: Request, res: Response) => {
+  try {
+    const revId = req.query.ReviewId.toString();
+    const isReviewExist = await FirstOrDefault(revTab, "Id", revId);
+
+    if (isReviewExist == null) {
+      const error = Message(400, NotFoundResponse("Review"));
+      return res.status(400).json(error);
+    }
+
+    await Remove(revTab, "Id", revId);
+    return res.status(200).json(DeletedResponse("Review", revId));
+  } catch (error) {
+    const errMessage = Message(500, InternalError);
+    return res.status(500).json(errMessage);
+  }
+};
+
+export const updateReview = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const payload: IUpdateReview = req.body;
+
+    const isReviewExist = await FirstOrDefault(revTab, "Id", payload.Id);
+    if (isReviewExist === null) {
+      const error = Message(400, NotFoundResponse("Review"));
+      return res.status(400).json(error);
+    }
+
+    var isUserExist = await FirstOrDefault(sTab, Id, payload.UserId);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    // compareAndUpdateProperties(payload, isReviewExist);
+    const updatePayload = {
+      UpdatedAt: currentTime,
+      AgreeCount: payload.WhoLiked.length,
+      DisagreeCount: payload.WhoDisliked.length,
+      WhoLiked: payload.WhoLiked,
+      WhoDisliked: payload.WhoDisliked,
+      Review: payload.Review,
+    };
+    const response = await Update(revTab, "Id", payload.Id, updatePayload);
+    const success = Message(200, UpdateSuccess, response);
+    return res.status(200).json(success);
+  } catch (error) {
+    console.log(error);
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
   }
 };
 

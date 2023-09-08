@@ -1,16 +1,10 @@
 import { getMessaging } from "firebase-admin/messaging";
 import {
-  IAllUserFCMTokens,
-  IFirebaseUserToken,
   IGetKitchenOrdersDto,
   IGetOrdersDto,
   INotifyMessage,
-  IReview,
-  IUpdateReview,
   addKitStaffKeys,
-  fcmTokenkeys,
   noEditKitchenKeys,
-  reviewkeys,
   validateBankKeys,
 } from "./../Models/DTOs/IKitchenDto";
 
@@ -47,7 +41,7 @@ import {
   FirstOrDefault,
   GetAll,
   GetAllById,
-  QueryParamsFirstOrDefault,
+  FirstOrDefaultQueryable,
   Remove,
   Update,
 } from "../Infrastructure/Repository";
@@ -61,7 +55,6 @@ import NodeCache from "node-cache";
 import {
   CryptoGenSixDigitNum,
   RandGenSixDigitNum,
-  cryptoGenTrxRef,
 } from "../Utilities/RandomNumber";
 import { IEmailRequest } from "../Models/IEmail";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
@@ -97,10 +90,8 @@ import {
   notifyTab,
   ordTab,
   recTab,
-  revParam,
   revTab,
   rtokTab,
-  sTab,
   sentMessageTab,
   uid,
 } from "../Data/TableNames";
@@ -183,6 +174,7 @@ export const validateKitchenBank = async (
   res: Response
 ): Promise<any> => {
   try {
+    const email = req.query.Email.toString();
     const payload: IValidateBank = req.body;
 
     if (!isValidPayload(payload, validateBankKeys)) {
@@ -197,9 +189,7 @@ export const validateKitchenBank = async (
       return res.status(400).json(error);
     }
 
-    const email = req.query.email.toString();
     var isUserExist = await FirstOrDefault(kTab, dbId, email);
-
     if (isUserExist === null) {
       const error = Message(400, NotFoundResponse("Kitchen"));
       return res.status(400).json(error);
@@ -288,16 +278,26 @@ export const addKitchenStaff = async (
 
     const payload: IAddKitchenStaff = { ...checkPayload };
 
-    const userId = payload.Email;
+    const uEmail = payload.Email;
     const kId = payload.KitchenId;
 
-    var isUserExist = await FirstOrDefault(kTab, "Id", kId);
-    if (isUserExist === null) {
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kId);
+    if (isKitchenExist === null) {
       const error = Message(400, NotFoundResponse("Kitchen"));
       return res.status(400).json(error);
     }
-    // console.log(userId);
-    var isUserExist = await FirstOrDefault(kstaffTab, dbEmail, userId);
+
+    const queryParams = { ManagerEmail: uEmail, KitchenEmail: uEmail };
+    var isManager = await FirstOrDefaultQueryable(kTab, queryParams, "or");
+    if (isManager != null) {
+      const mdResponse =
+        "You are a kitchen manager, please use another email if you want to make yourself a staff";
+      const error = Message(400, mdResponse);
+      return res.status(400).json(error);
+    }
+
+    // console.log(uEmail);
+    var isUserExist = await FirstOrDefault(kstaffTab, dbEmail, uEmail);
     if (isUserExist != null) {
       const error = Message(400, AlreadyExistResponse("Staff"));
       return res.status(400).json(error);
@@ -341,7 +341,7 @@ export const deleteKitchenStaff = async (
   res: Response
 ): Promise<any> => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     const isKitchenExist = await FirstOrDefault(kstaffTab, dbEmail, email);
 
     if (isKitchenExist === null) {
@@ -359,7 +359,7 @@ export const deleteKitchenStaff = async (
 
 export const updateKitchenStaff = async (req: Request, res: Response) => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     const checkPayload: IKitchenUpdateStaff = req.body;
 
     const emptyFields = Validation(checkPayload);
@@ -473,7 +473,7 @@ export const resendVerifyEmail = async (
   res: Response
 ): Promise<any> => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     // console.log("Email: ", email);
     var checkKitchen = await FirstOrDefault(kTab, dbId, email);
     var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, email);
@@ -522,7 +522,7 @@ export const forgotPassword = async (
   res: Response
 ) => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     var checkKitchen = await FirstOrDefault(kTab, dbId, email);
     var checkstaff = await FirstOrDefault(kstaffTab, dbEmail, email);
 
@@ -539,8 +539,8 @@ export const forgotPassword = async (
       ForgotPin: forgotDigit,
       ExpiresAt: currentTime,
     };
-    var checkForgot = await FirstOrDefault(forgot, "UserEmail", email);
 
+    var checkForgot = await FirstOrDefault(forgot, "UserEmail", email);
     if (checkForgot === null) {
       await AddToDB(forgot, payload);
     } else {
@@ -562,7 +562,6 @@ export const forgotPassword = async (
     const payloadArray = Array.from(rabbitmqPayload.Payload);
     // Update the original object with the array
     rabbitmqPayload.Payload = payloadArray;
-
     const rabbitmqPayloadString = JSON.stringify(rabbitmqPayload);
     producer.publishMessage(rabbitmqPayloadString); // Using the producer instance from the middleware
 
@@ -614,7 +613,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const updateKitchen = async (req: Request, res: Response) => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     const editedKitchen: IKitchenUpdate = req.body;
     const isKitchenExist = await FirstOrDefault(kTab, dbId, email);
     if (isKitchenExist == null) {
@@ -644,7 +643,7 @@ export const updateKitchen = async (req: Request, res: Response) => {
 
 export const deleteKitchen = async (req: Request, res: Response) => {
   try {
-    const email = req.query.email.toString();
+    const email = req.query.Email.toString();
     const isKitchenExist = await FirstOrDefault(kTab, dbId, email);
 
     if (isKitchenExist == null) {
@@ -687,7 +686,7 @@ export const createFoodMenu = async (
     var isKitchenExist = await FirstOrDefault(kTab, dbkId2, kId2);
     // var isFoodExist = await FirstOrDefault(kmTab, dbkId, kId);
     const queryParams = { KitchenId: kId2, FoodName: kId };
-    var isFoodExist = await QueryParamsFirstOrDefault(kmTab, queryParams);
+    var isFoodExist = await FirstOrDefaultQueryable(kmTab, queryParams, "and");
 
     if (isKitchenExist === null) {
       const error = Message(400, NotFoundResponse("Kitchen"));
@@ -745,7 +744,7 @@ export const deleteFoodMenu = async (req: Request, res: Response) => {
     const isKitchenExist = await FirstOrDefault(kmTab, "Id", menuId);
 
     if (isKitchenExist == null) {
-      const error = Message(400, NotFoundResponse("Kitchen"));
+      const error = Message(400, NotFoundResponse("Food menu"));
       res.status(400).json(error);
     } else {
       await Remove(kmTab, "Id", menuId);
@@ -847,62 +846,6 @@ const CheckCacheResource = (cacheKey: string, res: Response): boolean => {
   return false;
 };
 
-export const writeReview = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  try {
-    const checkPayload: IReview = req.body;
-
-    if (!isValidPayload(checkPayload, reviewkeys)) {
-      const error = Message(400, "Invalid payload");
-      return res.status(400).json(error);
-    }
-
-    const emptyFields = Validation(checkPayload);
-    if (emptyFields.length > 0) {
-      const errorMessage = `${emptyFields.join(", ")} cannot be null or empty`;
-      const error = Message(400, errorMessage);
-      return res.status(400).json(error);
-    }
-
-    var isUserExist = await FirstOrDefault(kTab, Id, checkPayload.KitchenId);
-    if (isUserExist === null) {
-      const error = Message(400, NotFoundResponse("Kitchen"));
-      return res.status(400).json(error);
-    }
-
-    var isUserExist = await FirstOrDefault(sTab, Id, checkPayload.UserId);
-    if (isUserExist === null) {
-      const error = Message(400, NotFoundResponse("User"));
-      return res.status(400).json(error);
-    }
-
-    const rev = checkPayload.Review;
-    var isUserExist = await FirstOrDefault(revTab, revParam, rev);
-    if (isUserExist != null) {
-      const error = Message(400, AlreadyExistResponse("This review"));
-      return res.status(400).json(error);
-    }
-
-    checkPayload.Tag = await cryptoGenTrxRef(7, revTab, "Tag");
-    checkPayload.AgreeCount = 0;
-    checkPayload.DisagreeCount = 0;
-    checkPayload.WhoDisliked = [""];
-    checkPayload.WhoLiked = [""];
-
-    // producer.publishMessage("This is a test");
-    const response = await AddToDB(revTab, checkPayload);
-    const success = Message(200, CreateSuccess, response);
-    return res.status(200).json(success);
-
-    // console.log(payload);
-  } catch (error) {
-    const err = Message(500, InternalError);
-    res.status(500).json(err);
-  }
-};
-
 export const getReviews = async (req: Request, res: Response): Promise<any> => {
   try {
     const kitId = req.query.KitchenId.toString();
@@ -916,62 +859,6 @@ export const getReviews = async (req: Request, res: Response): Promise<any> => {
   } catch (error) {
     const err = Message(500, InternalError);
     res.status(500).json(err);
-  }
-};
-
-export const deleteReview = async (req: Request, res: Response) => {
-  try {
-    const revId = req.query.ReviewId.toString();
-    const isReviewExist = await FirstOrDefault(revTab, "Id", revId);
-
-    if (isReviewExist == null) {
-      const error = Message(400, NotFoundResponse("Review"));
-      return res.status(400).json(error);
-    }
-
-    await Remove(revTab, "Id", revId);
-    return res.status(200).json(DeletedResponse("Review", revId));
-  } catch (error) {
-    const errMessage = Message(500, InternalError);
-    return res.status(500).json(errMessage);
-  }
-};
-
-export const updateReview = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  try {
-    const payload: IUpdateReview = req.body;
-
-    const isReviewExist = await FirstOrDefault(revTab, "Id", payload.Id);
-    if (isReviewExist === null) {
-      const error = Message(400, NotFoundResponse("Review"));
-      return res.status(400).json(error);
-    }
-
-    var isUserExist = await FirstOrDefault(sTab, Id, payload.UserId);
-    if (isUserExist === null) {
-      const error = Message(400, NotFoundResponse("User"));
-      return res.status(400).json(error);
-    }
-
-    // compareAndUpdateProperties(payload, isReviewExist);
-    const updatePayload = {
-      UpdatedAt: currentTime,
-      AgreeCount: payload.WhoLiked.length,
-      DisagreeCount: payload.WhoDisliked.length,
-      WhoLiked: payload.WhoLiked,
-      WhoDisliked: payload.WhoDisliked,
-      Review: payload.Review,
-    };
-    const response = await Update(revTab, "Id", payload.Id, updatePayload);
-    const success = Message(200, UpdateSuccess, response);
-    return res.status(200).json(success);
-  } catch (error) {
-    console.log(error);
-    const err = Message(500, InternalError);
-    return res.status(500).json(err);
   }
 };
 

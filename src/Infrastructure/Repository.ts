@@ -47,16 +47,17 @@ export const FirstOrDefault = async (
   }
 };
 
-export const QueryParamsFirstOrDefault = async (
+export const FirstOrDefaultQueryable = async (
   tableName: string,
-  params: { [key: string]: any }
+  params: { [key: string]: any },
+  operation: string
 ): Promise<any> => {
   try {
     const paramKeys = Object.keys(params);
     const paramValues = paramKeys.map((key) => params[key]);
     const whereConditions = paramKeys
       .map((key, index) => `"${key}" = $${index + 1}`)
-      .join(" AND ");
+      .join(` ${operation.toUpperCase()} `);
 
     const fetchByIdQuery = `SELECT * FROM "${tableName}" WHERE ${whereConditions}`;
     const result = await client.query(fetchByIdQuery, paramValues);

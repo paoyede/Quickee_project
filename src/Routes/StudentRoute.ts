@@ -15,6 +15,9 @@ import {
   fundWallet,
   chargeWallet,
   registerDeviceToken,
+  writeReview,
+  updateReview,
+  deleteReview,
 } from "../Controller/StudentController";
 import { Request, Response, Router } from "express";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
@@ -38,14 +41,17 @@ const studentRoute = (producer: Producer) => {
   );
   router.put("/ResetPassword", resetPassword);
   router.post("/SaveOrders", authtoken, saveOrders);
-  router.post("/SaveQuickOrders", authtoken, saveQuickOrders);
-  router.put("/UpdateQuickOrders", authtoken, updateQuickOrders);
-  router.get("/GetQuickOrdersByUserEmail", authtoken, getQuickOrdersByUserId);
   router.get("/GetOrdersByUserEmail", authtoken, getOrdersByUserEmail);
+  router.post("/SaveQuickOrders", authtoken, saveQuickOrders);
+  router.get("/GetQuickOrdersByUserEmail", authtoken, getQuickOrdersByUserId);
+  router.put("/UpdateQuickOrders", authtoken, updateQuickOrders);
   router.delete("/DeleteQuickOrders", authtoken, deleteQuickOrders);
   router.post("/FundWallet", authtoken, fundWallet);
   router.post("/ChargeWallet", authtoken, chargeWallet);
   router.post("/RegisterDeviceToken", registerDeviceToken);
+  router.post("/WriteReview", authtoken, writeReview);
+  router.put("/UpdateReview", authtoken, updateReview);
+  router.delete("/DeleteReviewById", authtoken, deleteReview);
 
   return router;
 };

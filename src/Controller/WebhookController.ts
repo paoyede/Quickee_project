@@ -7,7 +7,7 @@ import {
   AddToDB,
   FirstOrDefault,
   GetAllById,
-  QueryParamsFirstOrDefault,
+  FirstOrDefaultQueryable,
   Update,
 } from "../Infrastructure/Repository";
 import { IPaymentDto, ITransferDBDto, ITransferDto } from "../Models/IKitchen";
@@ -103,13 +103,14 @@ export const verifyWebhook = async (req: Request, res: Response) => {
           for (let index = 0; index < payload.length; index++) {
             const eOrder = payload[index];
             const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
-            const fetchMenu = await QueryParamsFirstOrDefault(
+            const getMenu = await FirstOrDefaultQueryable(
               kmTab,
-              queryParams
+              queryParams,
+              "and"
             );
-            const qty = parseInt(fetchMenu.TotalQuantity);
+            const qty = parseInt(getMenu.TotalQuantity);
             const ordQty = parseInt(eOrder.Scoops);
-            await Update(kmTab, Id, fetchMenu.Id, {
+            await Update(kmTab, Id, getMenu.Id, {
               TotalQuantity: qty - ordQty,
             });
           }
@@ -188,13 +189,14 @@ export const verifyWebhook = async (req: Request, res: Response) => {
             for (let index = 0; index < payload.length; index++) {
               const eOrder = payload[index];
               const queryParams = { KitchenId: kitId, FoodName: eOrder.Name };
-              const fetchMenu = await QueryParamsFirstOrDefault(
+              const getMenu = await FirstOrDefaultQueryable(
                 kmTab,
-                queryParams
+                queryParams,
+                "and"
               );
-              const qty = parseInt(fetchMenu.TotalQuantity);
+              const qty = parseInt(getMenu.TotalQuantity);
               const ordQty = parseInt(eOrder.Scoops);
-              await Update(kmTab, Id, fetchMenu.Id, {
+              await Update(kmTab, Id, getMenu.Id, {
                 TotalQuantity: qty - ordQty,
               });
             }
