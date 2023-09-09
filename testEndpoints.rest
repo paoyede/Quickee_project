@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiMGIyMjNjY2EtZWQ0Zi00NjdhLWJhZDMtOWFiYmZjMzUxYTkwIiwiaWF0IjoxNjk0MTYyOTA4LCJleHAiOjE2OTQxNjY1MDh9.Y38EY2z7SffuvKu8DdZ3H4T2JyvJxtni6hYEKIvJYn8
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFsYWRlcmFwaHJlZG9AeWFob28uY29tIiwiVXNlcklkIjoiMWZjMjM5ODItN2ZjOC00NjI4LWJiYmItMTI3NzA4ZDRjOTVlIiwiaWF0IjoxNjk0MjA5MjA2LCJleHAiOjE2OTQyMTI4MDZ9.3pPHA7NYA_0kewFI8YFA1mFwmqx0MyN5co87KqDfXBM
 ###@atk1 = {{atk}}
 @url = http://52.14.36.26:85
 # @url = http://192.168.186.240
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 {
     "UserName": "Alade.Aduragbemi",
-    "Password": "Alade1&&&"
+    "Password": "Aduragbemi1&&&"
 }
 
 ###
@@ -38,7 +38,7 @@ PUT {{url}}/Student/VerifyEmail
 Content-Type: application/json
 
 {
-   "EmailOTP": "965485",
+   "EmailOTP": "625413",
    "Email": "raphael.tunji@yahoo.com"
 }
 
@@ -52,7 +52,7 @@ Content-Type: application/json
 
 {
   "Email": "raphael.tunji@yahoo.com",
-  "OTP": "479260",
+  "OTP": "230568",
   "NewPassword": "Aduragbemi1&&&"
 }
 ###
@@ -66,18 +66,18 @@ Authorization: BEARER {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "f0807bbf-1ef9-4715-ab80-ef7a24d2f903",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
   "Description": "Mix the rice",
   "Items": [
     {
       "Name": "Jollof",
-      "Price": 900,
-      "Scoops": 3
+      "Price": 58500,
+      "Scoops": 195
     },
     {
       "Name": "Fried",
-      "Price": 900,
-      "Scoops": 3
+      "Price": 600,
+      "Scoops": 2
     },
     {
       "Name": "Chicken",
@@ -98,15 +98,15 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId":"f0807bbf-1ef9-4715-ab80-ef7a24d2f903",
-  "UserId":"9209b769-a8f4-42b5-a397-8552720079d7",
+  "KitchenId":"1fc23982-7fc8-4628-bbbb-127708d4c95e",
+  "UserId":"67338fe9-5d3a-468e-be81-57b52ec7496b",
   "Reviewer":"Raphael Olaiyapo",
   "Review":"Laughter kitchen is the best"
 }
 
 ###
 
-DELETE {{url}}/Student/DeleteReviewById?ReviewId=65145dc6-d8c3-4cd7-b4e8-06ef0621830f
+DELETE {{url}}/Student/DeleteReviewById?ReviewId=f63fd2a8-f685-4356-ad3a-63199666f98c
 Authorization: Bearer {{atk}}
 
 ###
@@ -116,10 +116,10 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "Id":"c73c89bc-985a-4663-b4a6-8e741649a9b2",
-  "UserId":"9209b769-a8f4-42b5-a397-8552720079d7",
+  "Id":"f63fd2a8-f685-4356-ad3a-63199666f98c",
+  "UserId":"67338fe9-5d3a-468e-be81-57b52ec7496b",
   "Review":"Laughter kitchen is the best in this university",
-  "WhoLiked":["swift@gmail.com","hello7@gmail.com","trending@yahoo.com"],
+  "WhoLiked":["swift@gmail.com","trending@yahoo.com"],
   "WhoDisliked":["trend@yahoo.com"]
 }
 
@@ -130,7 +130,7 @@ Content-Type: application/json
 
 {
   "FcmToken": "646fshfAzxQ9",
-  "UserId": "9209b769-a8f4-42b5-a397-8552720079d7"
+  "UserId": "67338fe9-5d3a-468e-be81-57b52ec7496b"
 }
 
 ###
@@ -146,7 +146,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "amount": 1200
+  "amount": 100000
 }
 
 ###
@@ -157,7 +157,7 @@ Content-Type: application/json
 
 {
   "email": "raphael.tunji@yahoo.com",
-  "orderId": "d2145141-b023-429e-8b18-afc15b0632ca"
+  "orderId": "995d4456-dc6b-4aab-aac9-3d9c8ad1464e"
 }
 
 ###
@@ -167,13 +167,13 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "f0807bbf-1ef9-4715-ab80-ef7a24d2f903",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
   "OrderName":"Afternoon Food",
   "Description": "Separate the chicken",
   "Items": [
     {
       "Name": "Jollof rice",
-      "Price": 800,
+      "Price": 600,
       "Scoops": 2
     },
     {
@@ -187,8 +187,8 @@ Content-Type: application/json
       "Scoops": 1
     },
     {
-      "Name": "Cow tail",
-      "Price": 2500,
+      "Name": "Coke",
+      "Price": 300,
       "Scoops": 1
     }
   ]
@@ -205,31 +205,31 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "f0807bbf-1ef9-4715-ab80-ef7a24d2f903",
-  "OrderId":"ad12a0e6-823c-4997-a0af-0ab49adf8697",
-  "OrderName":"Afternoon food",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
+  "OrderId":"3bcae8eb-4948-40fb-b275-7c2a5a32196e",
+  "OrderName":"Night food",
   "Description": "Mix the soup together",
   "Items": [
     {
-      "Id":"d2c2e818-848e-4d46-a396-291f456f8aac",
+      "Id":"9d818115-1529-4e38-b22e-b554e0e9e15b",
       "Name": "Amala",
       "Price": 900,
       "Scoops": 3
     },
     {
-      "Id":"0959d4b5-0f6a-4dc3-ac25-595fa1c3e738",
+      "Id":"f1ccd540-f169-4d67-b9f1-98fa8226e2e7",
       "Name": "Egusi soup",
       "Price": 600,
       "Scoops": 2
     },
     {
-      "Id":"56364f78-bb15-4459-91cf-ec3090b31750",
+      "Id":"601d086a-3cc0-46e4-9631-90229e71a43e",
       "Name": "Chicken",
       "Price": 1200,
       "Scoops": 1
     },
     {
-      "Id":"3e7496ef-16ac-431a-b982-e690adb44f9c",
+      "Id":"ec4682e2-a44a-453d-bbfe-893fb0a508c7",
       "Name": "Okro soup",
       "Price": 300,
       "Scoops": 2
@@ -239,7 +239,7 @@ Content-Type: application/json
 
 ###
 
-DELETE {{url}}/Student/DeleteQuickOrders?QoId=ad12a0e6-823c-4997-a0af-0ab49adf8697
+DELETE {{url}}/Student/DeleteQuickOrders?QoId=3bcae8eb-4948-40fb-b275-7c2a5a32196e
 Authorization: Bearer {{atk}}
 
 ###
@@ -269,7 +269,7 @@ Content-Type: application/json
 
 {
   //"Email": "aladeraphredo@yahoo.com",
-  "Email":"raphael.tunji@yahoo.com",
+  "Email":"raphael.tunji@yahoo.com",  
   "Password": "Alade1&&&"
 }
 
@@ -279,7 +279,7 @@ PUT {{url}}/Kitchen/VerifyEmail
 Content-Type: application/json
 
 {
-  "EmailOTP": "735495",
+  "EmailOTP": "924755",
   "Email":"raphael.tunji@yahoo.com"
   //"Email": "aladeraphredo@yahoo.com"
 }
@@ -299,7 +299,7 @@ Content-Type: application/json
 
 {
   "Email":"aladeraphredo@yahoo.com",
-  "OTP": "327437",
+  "OTP": "077713",
   "NewPassword": "Aduragbemi1&&&"
 }
 
@@ -310,7 +310,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "AccountNumber":363846484649,
+  //"AccountNumber":363846484649,
   "ManagerPhone": 61982374629
 }
 ###
@@ -323,7 +323,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "f0807bbf-1ef9-4715-ab80-ef7a24d2f903",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
   "FirstName": "Raphael",
   "LastName": "Olaiyapo",
   "Email": "raphael.tunji@yahoo.com",
@@ -356,10 +356,10 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "f0807bbf-1ef9-4715-ab80-ef7a24d2f903",
-  "FoodName": "Fried",
-  "Category": "Food",
-  "Class": "Rice",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
+  "FoodName": "Coke",
+  "Category": "Drinks",
+  "Class": "Mineral",
   "Price": 300,
   "TotalQuantity": 200,
   "Status": "available"
@@ -367,21 +367,21 @@ Content-Type: application/json
 
 ###
 
-PUT {{url}}/Kitchen/UpdateMenu?MenuId=e8c9de5f-5666-4359-916a-8a7aa3d612af
+PUT {{url}}/Kitchen/UpdateMenu?MenuId=56481cf3-bf86-4991-b39f-beb8fe064d27
 Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "TotalQuantity": 200
-  //"Status": "available"
+  "TotalQuantity": 200,
+  "Status": "available"
 }
 ###
 
-DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9e9bb2c5-ee50-4e12-8dba-100d488ad25f
+DELETE {{url}}/Kitchen/DeleteMenu?MenuId=9d6ea044-1c3e-4032-8b82-573df5dd5fa8
 Authorization: Bearer {{atk}}
 ###
 
-GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=f0807bbf-1ef9-4715-ab80-ef7a24d2f903
+GET {{url}}/Kitchen/GetKitchenMenus?KitchenId=1fc23982-7fc8-4628-bbbb-127708d4c95e
 Authorization: Bearer {{atk}}
 ###
 
@@ -406,7 +406,7 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/Kitchen/GetReviewsByKitchenId?KitchenId=f0807bbf-1ef9-4715-ab80-ef7a24d2f903
+GET {{url}}/Kitchen/GetReviewsByKitchenId?KitchenId=1fc23982-7fc8-4628-bbbb-127708d4c95e
 Authorization: Bearer {{atk}}
 
 ###
@@ -416,8 +416,8 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "e5454b54-983a-499c-89ff-57132260b1c2",
-  "UserId": "bb98c2c8-60e1-45d8-9771-742c0d8cb03b",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
+  "UserId": "67338fe9-5d3a-468e-be81-57b52ec7496b",
   "Title": "Order is ready",
   "Message": "Your Order is ready for collection" 
 }
@@ -429,7 +429,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "KitchenId": "e5454b54-983a-499c-89ff-57132260b1c2",
+  "KitchenId": "1fc23982-7fc8-4628-bbbb-127708d4c95e",
   "UserId": "bb98c2c8-60e1-45d8-9771-742c0d8cb03b",
   "Title": "Order is ready",
   "Message": "Your Order is ready for collection" 
@@ -442,7 +442,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "orderId": "bff7fc69-7467-4a6e-af92-65ed8e9163ff",
+  "orderId": "4701d0c1-27f9-41ec-b01d-8c7bd142ce5e",
   "email": "raphael.tunji@yahoo.com",
   "amount": 0
 }

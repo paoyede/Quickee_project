@@ -11,6 +11,7 @@ import {
   getKitchenOrdersByEmail,
   getNGBanks,
   getReviews,
+  kitchenImageUpload,
   notifyToAllUsers,
   resendVerifyEmail,
   resetPassword,
@@ -26,6 +27,10 @@ import { Request, Response, Router } from "express";
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
 import { verifyWebhook } from "../Controller/WebhookController";
+import fileUpload from "express-fileupload";
+import { FileExtLimiter } from "../Middleware/FileExtLimiter";
+import { FileSizeLimiter } from "../Middleware/FileSizeLimiter";
+import { FilesPayloadExists } from "../Middleware/FilesPayloadExists";
 
 const kitchenRoute = (producer: Producer) => {
   const router: Router = Router();
@@ -61,6 +66,14 @@ const kitchenRoute = (producer: Producer) => {
   router.get("/GetReviewsByKitchenId", authtoken, getReviews);
   router.post("/SendNotification", authtoken, sendNotification);
   router.post("/NotifiyAllUsers", authtoken, notifyToAllUsers);
+  router.post(
+    "/Upload",
+    fileUpload({ createParentPath: true }),
+    FilesPayloadExists,
+    FileExtLimiter([".png", ".jpg", ".jpeg"]),
+    FileSizeLimiter,
+    kitchenImageUpload
+  );
 
   return router;
 };
