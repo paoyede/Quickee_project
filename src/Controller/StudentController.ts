@@ -49,6 +49,7 @@ import {
 import Producer from "../Services/Implementations/MessageBroker/Producer";
 import {
   IAllQuickOrdersDto,
+  IGetKitInUserUniversity,
   IOrderDto,
   IQuickOrderDto,
   ISignInDto,
@@ -105,6 +106,7 @@ import {
   trRef,
   trTab,
   uid,
+  uni,
   wTab,
 } from "../Data/TableNames";
 
@@ -1003,6 +1005,42 @@ export const updateReview = async (
     return res.status(200).json(success);
   } catch (error) {
     console.log(error);
+    const err = Message(500, InternalError);
+    return res.status(500).json(err);
+  }
+};
+
+export const getKitchensInUserUniversity = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const payload: IGetKitInUserUniversity = req.body;
+    const email = payload.Email;
+    var isUserExist = await FirstOrDefault(sTab, dbEmail, email);
+    if (isUserExist === null) {
+      const error = Message(400, NotFoundResponse("User"));
+      return res.status(400).json(error);
+    }
+
+    const univ = payload.University;
+    const kitchens = await GetAllById(kTab, uni, univ);
+    let response = [];
+    // console.log(kitchens);
+    if (kitchens.length > 0) {
+      for (let index = 0; index < kitchens.length; index++) {
+        const kitchen = kitchens[index];
+        const kitResponse = {
+          KitchenId: kitchen.Id,
+          KitchenName: kitchen.KitchenName,
+          KitchenImage: kitchen.KitchenImage,
+        };
+        response.push(kitResponse);
+      }
+    }
+    const success = Message(200, FetchedSuccess, response);
+    return res.status(200).json(success);
+  } catch (error) {
     const err = Message(500, InternalError);
     return res.status(500).json(err);
   }

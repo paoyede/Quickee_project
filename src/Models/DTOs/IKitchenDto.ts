@@ -41,6 +41,7 @@ export const validateBankKeys: string[] = [
 export const noEditKitchenKeys: string[] = [
   "KitchenEmail",
   "ManagerEmail",
+  "KitchenImage",
   "Password",
   "University",
   "AccountNumber",

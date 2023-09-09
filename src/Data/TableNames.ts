@@ -27,3 +27,4 @@ export const revTab = "Review";
 export const revParam = "Review";
 export const notifyTab = "Notifications";
 export const sentMessageTab = "SentMessages";
+export const uni = "University";

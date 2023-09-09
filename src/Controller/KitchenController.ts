@@ -175,46 +175,6 @@ export const kitchenImageUpload = async (
   res: Response
 ): Promise<any> => {
   try {
-    // Create a new instance of the formidable.IncomingForm class
-    //   const uploadDir = path.join(__dirname, "../UploadedImage");
-    //   const form = new formidable.IncomingForm({
-    //     uploadDir: uploadDir, // Specify the upload directory here
-    //   });
-    //   // Parse the incoming form data
-    //   form.parse(req, (err, fields, files) => {
-    //     if (err) {
-    //       console.error("Error parsing form:", err);
-    //       res.writeHead(500, { "Content-Type": "text/plain" });
-    //       res.end("An error occurred during file upload.");
-    //       return;
-    //     }
-    //     // Ensure files.upload is an array
-    //     const uploadedFiles = Array.isArray(files.upload)
-    //       ? files.upload
-    //       : [files.upload];
-    //     // Loop through each uploaded file and move it to the specified directory
-    //     uploadedFiles.forEach((file) => {
-    //       const oldPath = file.filepath;
-    //       const newPath = uploadDir + "/" + file.originalFilename;
-    //       fs.rename(oldPath, newPath, (err) => {
-    //         if (err) {
-    //           console.error("Error moving file:", err);
-    //           res.writeHead(500, { "Content-Type": "text/plain" });
-    //           res.end("An error occurred while saving the file.");
-    //         } else {
-    //           console.log(
-    //             "File uploaded and saved successfully:",
-    //             file.originalFilename
-    //           );
-    //         }
-    //       });
-    //     });
-    //     res.writeHead(200, { "Content-Type": "text/plain" });
-    //     res.end("All files uploaded and saved successfully.");
-    //   });
-    //   return;
-    // }
-    // Now, you should be able to use Multer types
     // const files: { [key: string]: Express.Multer.File } = req.files;
     const files: any = req.files;
 

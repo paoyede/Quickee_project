@@ -18,6 +18,7 @@ import {
   writeReview,
   updateReview,
   deleteReview,
+  getKitchensInUserUniversity,
 } from "../Controller/StudentController";
 import { Request, Response, Router } from "express";
 import { producerMiddleware } from "../Middleware/RabbitMQProducer";
@@ -52,6 +53,11 @@ const studentRoute = (producer: Producer) => {
   router.post("/WriteReview", authtoken, writeReview);
   router.put("/UpdateReview", authtoken, updateReview);
   router.delete("/DeleteReviewById", authtoken, deleteReview);
+  router.post(
+    "/GetKitchenInUserUniversity",
+    authtoken,
+    getKitchensInUserUniversity
+  );
 
   return router;
 };

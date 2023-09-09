@@ -98,3 +98,8 @@ export interface UpdateItemDto {
   CreatedAt: string;
   UpdatedAt: string;
 }
+
+export interface IGetKitInUserUniversity {
+  Email: string;
+  University: string;
+}

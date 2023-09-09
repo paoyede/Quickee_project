@@ -37,6 +37,7 @@ export interface IKitchenUpdate {
   ManagerPhone?: number;
   AdminEmail?: string;
   University?: string;
+  KitchenImage?: string;
 }
 
 export interface IKitchenUpdateStaff {

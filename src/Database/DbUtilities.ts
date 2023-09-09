@@ -20,7 +20,7 @@ export const studentTable =
   `"Role" TEXT, "ExpiresAt" TIMESTAMP, "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
 
 export const kitchenTable =
-  `CREATE TABLE "Kitchen" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenName" TEXT, "KitchenEmail" TEXT,` +
+  `CREATE TABLE "Kitchen" ("Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), "KitchenName" TEXT, "KitchenEmail" TEXT, "KitchenImage" VARCHAR,` +
   `"ManagerFirstName" TEXT, "ManagerLastName" TEXT, "ManagerPhone" BIGINT, "ManagerEmail" VARCHAR, "Password" VARCHAR, "IsVerifiedEmail" BOOLEAN DEFAULT false,` +
   `"University" TEXT, "AccountNumber" BIGINT, "AccountName" TEXT, "BankName" TEXT, "VerificationCode" VARCHAR(6), "ExpiresAt" TIMESTAMP,` +
   `"Role" TEXT,"CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
