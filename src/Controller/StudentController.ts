@@ -1034,7 +1034,7 @@ export const getKitchensInUserUniversity = async (
         const kitchen = kitchens[index];
         const kImg =
           kitchen.KitchenImage === null ? "no-image.png" : kitchen.KitchenImage;
-        const imgName = path.join(__dirname, iPath, kImg);
+        const imgName = kImg; // path.join(__dirname, iPath, kImg);
         const kitResponse = {
           KitchenId: kitchen.Id,
           KitchenName: kitchen.KitchenName,
