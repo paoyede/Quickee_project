@@ -62,7 +62,7 @@ if (cluster.isPrimary) {
       app.use(compression());
       app.use(cookieParser());
       app.use(bodyParser.json());
-      app.use(express.static(path.join(__dirname, "public")));
+      app.use(express.static(path.join(__dirname, "../public")));
       //initializing firebase for push notification
       // initializeApp({
       //   credential: applicationDefault(),
