@@ -96,6 +96,7 @@ import {
 } from "../Data/TableNames";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
+import * as fs from "fs";
 
 const axioWith = axiosWithAuth(paystacksecret, "https://api.paystack.co");
 const cache = new NodeCache();
@@ -176,19 +177,29 @@ export const kitchenImageUpload = async (
 ): Promise<any> => {
   try {
     // const files: { [key: string]: Express.Multer.File } = req.files;
+    let FileName: any;
     const files: any = req.files;
+    const kitId = req.query.KitchenId.toString();
+    var isKitchenExist = await FirstOrDefault(kTab, "Id", kitId);
+    if (isKitchenExist === null) {
+      const error = Message(400, NotFoundResponse("Kitchen"));
+      return res.status(400).json(error);
+    }
 
+    // const unique = await cryptoGenTrxRef(7, kTab, "TrxRef");
     // console.log(files);
     Object.keys(files).forEach((key) => {
       const uuid: string = uuidv4();
       const fileName = uuid + "-" + files[key].name;
+      FileName = fileName;
       const filepath = path.join(__dirname, "../Uploads", fileName);
       console.log(filepath);
       // Check if 'mv' exists before calling it
       if (files[key].mv) {
-        files[key].mv(filepath, (err: any) => {
-          if (err)
+        files[key].mv(filepath, async (err: any) => {
+          if (err) {
             return res.status(500).json({ status: "error", message: err });
+          }
         });
       } else {
         console.error(`mv method not found for file with key '${key}'`);
@@ -199,6 +210,20 @@ export const kitchenImageUpload = async (
     //   status: "success",
     //   message: "Uploaded", //Object.keys(files).toString(),
     // });
+    const imgName = isKitchenExist.KitchenImage;
+    const imgPathToDelete = path.join(__dirname, "../Uploads", imgName);
+    if (fs.existsSync(imgPathToDelete)) {
+      fs.unlink(imgPathToDelete, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted successfully");
+        }
+      });
+    } else {
+      console.log("File does not exist.");
+    }
+    await Update(kTab, Id, kitId, { KitchenImage: FileName });
     const response = Message(200, "Success upload");
     return res.status(200).json(response);
   } catch (error) {

@@ -109,6 +109,7 @@ import {
   uni,
   wTab,
 } from "../Data/TableNames";
+import * as path from "path";
 
 const currentTime = new Date();
 
@@ -1030,10 +1031,12 @@ export const getKitchensInUserUniversity = async (
     if (kitchens.length > 0) {
       for (let index = 0; index < kitchens.length; index++) {
         const kitchen = kitchens[index];
+        const kImg = kitchen.KitchenImage;
+        const imgName = path.join(__dirname, "../Uploads", kImg);
         const kitResponse = {
           KitchenId: kitchen.Id,
           KitchenName: kitchen.KitchenName,
-          KitchenImage: kitchen.KitchenImage,
+          KitchenImage: imgName,
         };
         response.push(kitResponse);
       }

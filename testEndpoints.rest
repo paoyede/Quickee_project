@@ -1,6 +1,6 @@
 @rtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6ImFyY2hyYXBockBnbWFpbC5jb20iLCJVc2VySWQiOiIzNmIxOGRiMS0wMGEwLTQyNWUtODI1NC04OTE2MzhkZGU3MTgiLCJpYXQiOjE2ODc0NzkxMzd9.pBCLVGFfx1d6R__LBtOndrX6H9ExclypzrVDD1URwRY"
 ##@rtk1 = {{rtk}}
-@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiOTIwOWI3NjktYThmNC00MmI1LWEzOTctODU1MjcyMDA3OWQ3IiwiaWF0IjoxNjk0MjY4NDA1LCJleHAiOjE2OTQyNzIwMDV9.qNcmhdhi_D_Wu2iG3oM4Yp9x0J3EZf_YkJd5rwSC17E
+@atk = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6InJhcGhhZWwudHVuamlAeWFob28uY29tIiwiVXNlcklkIjoiOTIwOWI3NjktYThmNC00MmI1LWEzOTctODU1MjcyMDA3OWQ3IiwiaWF0IjoxNjk0MzQ1NjAyLCJleHAiOjE2OTQzNDkyMDJ9.mFbSh7iGvWw84xOYgFSIgW7cNdlTGPft__ip7dnqqW8
 ###@atk1 = {{atk}}
 # @url = http://52.14.36.26:85
 # @url = http://192.168.186.240
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 ###
 
-POST {{url}}/Student/GetKitchenInUserUniversity
+POST {{url}}/Student/GetKitchensInUserUniversity
 Authorization: Bearer {{atk}}
 Content-Type: application/json
 
@@ -258,16 +258,16 @@ POST {{url}}/Kitchen/Create
 Content-Type: application/json
 
 {
-  "KitchenName": "ArchIntel",
-  "KitchenEmail": "aladeraphredo@yahoo.com",
-  "ManagerFirstName": "George",
-  "ManagerLastName": "Timileyin",
+  "KitchenName": "Penuel",
+  "KitchenEmail": "archraphr@gmail.com",
+  "ManagerFirstName": "Tim",
+  "ManagerLastName": "Cylon",
   "ManagerPhone": 2348102242355,
   "ManagerEmail": "archraphr@gmail.com",
   "Password": "Aduragbemi1&&&",
   "University": "Elizade University, Ondo",
   "AccountNumber": 3045313300,
-  "AccountName": "ArchIntel LTD",
+  "AccountName": "Penuel LTD",
   "BankCode": "011",
   "BankName": "CitiBank PLC"
 }

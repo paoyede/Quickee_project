@@ -54,7 +54,7 @@ const studentRoute = (producer: Producer) => {
   router.put("/UpdateReview", authtoken, updateReview);
   router.delete("/DeleteReviewById", authtoken, deleteReview);
   router.post(
-    "/GetKitchenInUserUniversity",
+    "/GetKitchensInUserUniversity",
     authtoken,
     getKitchensInUserUniversity
   );
