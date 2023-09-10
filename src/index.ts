@@ -14,6 +14,7 @@ import Producer from "./Services/Implementations/MessageBroker/Producer";
 import Consumer from "./Services/Implementations/MessageBroker/Consumer";
 import RabbitMQConfig from "./Services/Implementations/MessageBroker/Connection";
 import { initializeApp, applicationDefault } from "firebase-admin/app";
+import * as path from "path";
 
 const numCPUs = cpus().length;
 
@@ -61,6 +62,7 @@ if (cluster.isPrimary) {
       app.use(compression());
       app.use(cookieParser());
       app.use(bodyParser.json());
+      app.use(express.static(path.join(__dirname, "public")));
       //initializing firebase for push notification
       // initializeApp({
       //   credential: applicationDefault(),

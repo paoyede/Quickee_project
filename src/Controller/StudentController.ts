@@ -112,6 +112,7 @@ import {
 import * as path from "path";
 
 const currentTime = new Date();
+const iPath = "../../public/Uploads";
 
 // const producer = new Producer();
 
@@ -1031,8 +1032,9 @@ export const getKitchensInUserUniversity = async (
     if (kitchens.length > 0) {
       for (let index = 0; index < kitchens.length; index++) {
         const kitchen = kitchens[index];
-        const kImg = kitchen.KitchenImage;
-        const imgName = path.join(__dirname, "../Uploads", kImg);
+        const kImg =
+          kitchen.KitchenImage === null ? "no-image.png" : kitchen.KitchenImage;
+        const imgName = path.join(__dirname, iPath, kImg);
         const kitResponse = {
           KitchenId: kitchen.Id,
           KitchenName: kitchen.KitchenName,

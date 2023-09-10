@@ -97,11 +97,13 @@ import {
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import * as fs from "fs";
+// import v from "../../public/"
 
 const axioWith = axiosWithAuth(paystacksecret, "https://api.paystack.co");
 const cache = new NodeCache();
 
 const currentTime = new Date();
+const iPath = "../../public/Uploads";
 
 export const createKitchen = async (
   producer: Producer,
@@ -192,7 +194,7 @@ export const kitchenImageUpload = async (
       const uuid: string = uuidv4();
       const fileName = uuid + "-" + files[key].name;
       FileName = fileName;
-      const filepath = path.join(__dirname, "../Uploads", fileName);
+      const filepath = path.join(__dirname, iPath, fileName);
       console.log(filepath);
       // Check if 'mv' exists before calling it
       if (files[key].mv) {
@@ -211,7 +213,7 @@ export const kitchenImageUpload = async (
     //   message: "Uploaded", //Object.keys(files).toString(),
     // });
     const imgName = isKitchenExist.KitchenImage;
-    const imgPathToDelete = path.join(__dirname, "../Uploads", imgName);
+    const imgPathToDelete = path.join(__dirname, iPath, imgName);
     if (fs.existsSync(imgPathToDelete)) {
       fs.unlink(imgPathToDelete, (err) => {
         if (err) {
