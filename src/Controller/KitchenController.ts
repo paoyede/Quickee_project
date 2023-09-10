@@ -226,7 +226,9 @@ export const kitchenImageUpload = async (
       console.log("File does not exist.");
     }
     await Update(kTab, Id, kitId, { KitchenImage: FileName });
-    const response = Message(200, "Success upload");
+    const response = Message(200, "Success upload", "null", {
+      ImageUrl: FileName,
+    });
     return res.status(200).json(response);
   } catch (error) {
     const err = Message(500, InternalError);
